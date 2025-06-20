@@ -1,10 +1,12 @@
 import "dart:io";
+import "package:fotrix/models/aria2_client.dart";
 import "package:tray_manager/tray_manager.dart";
 import "package:window_manager/window_manager.dart";
 
 class TrayService {
   final TrayManager _tm = TrayManager.instance;
 
+  //初始化托盘信息
   Future<void> initTray() async {
     final winIcon =
         Platform.isWindows
@@ -22,6 +24,7 @@ class TrayService {
           MenuItem(
             label: '退出',
             onClick: (_) {
+              aria2Client.shutdownAria2();
               exit(0);
             },
           ),

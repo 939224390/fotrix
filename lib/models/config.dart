@@ -27,8 +27,9 @@ class Config with ChangeNotifier {
     }
   }
 
-  void initPowerBoot() {
+  void initConfig() {
     launchAtStartup.setup(appName: 'Fotrix', appPath: Platform.executable);
+    loadConfig();
   }
 
   // dark light

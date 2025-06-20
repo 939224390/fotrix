@@ -13,6 +13,7 @@ class Aria2Client {
   final int port;
   final String? secret;
 
+  Process? aria2Process;
   Aria2Client({this.host = 'localhost', this.port = 16800, this.secret});
 
   String get _baseUrl => 'http://$host:$port/jsonrpc';
@@ -121,39 +122,44 @@ class Aria2Client {
   Future<String> removeTask(String gid) async {
     return await _sendRequest('aria2.remove', [gid]);
   }
+
+  //启动aria2
+  void _startAria2() async {
+    //   final savePath = config.savePath;
+    // 获取应用文档目录
+    final appDocDir = await getApplicationDocumentsDirectory();
+    final aria2Path = '${appDocDir.path}/aria2/aria2c.exe';
+
+    // 确保 Aria2 可执行文件存在
+    if (!await File(aria2Path).exists()) {
+      // 从 assets 复制 Aria2 可执行文件到应用目录
+      await _copyAria2FromAssets(aria2Path);
+    }
+
+    // 给可执行文件添加执行权限
+    if (Platform.isLinux || Platform.isMacOS) {
+      await Shell().run('chmod +x $aria2Path');
+    }
+
+    // 启动 Aria2 进程
+    aria2Process = await Process.start(aria2Path, [
+      '--rpc-listen-port=16800',
+      '--enable-rpc',
+      '--rpc-listen-all=true',
+      '--rpc-allow-origin-all',
+      '--save-session-interval=60',
+      '--max-concurrent-downloads=10',
+      '--continue=true',
+    ]);
+  }
+
+  //关闭aria2服务
+  void shutdownAria2() {
+    aria2Process?.kill();
+  }
 }
 
 Aria2Client aria2Client = Aria2Client();
-
-//启动aria2
-void _startAria2() async {
-  //   final savePath = config.savePath;
-  // 获取应用文档目录
-  final appDocDir = await getApplicationDocumentsDirectory();
-  final aria2Path = '${appDocDir.path}/aria2/aria2c.exe';
-
-  // 确保 Aria2 可执行文件存在
-  if (!await File(aria2Path).exists()) {
-    // 从 assets 复制 Aria2 可执行文件到应用目录
-    await _copyAria2FromAssets(aria2Path);
-  }
-
-  // 给可执行文件添加执行权限
-  if (Platform.isLinux || Platform.isMacOS) {
-    await Shell().run('chmod +x $aria2Path');
-  }
-
-  // 启动 Aria2 进程
-  await Process.start(aria2Path, [
-    '--rpc-listen-port=16800',
-    '--enable-rpc',
-    '--rpc-listen-all=true',
-    '--rpc-allow-origin-all',
-    '--save-session-interval=60',
-    '--max-concurrent-downloads=10',
-    '--continue=true',
-  ]);
-}
 
 /// 从 assets 复制 Aria2 可执行文件到应用目录
 Future<void> _copyAria2FromAssets(String destinationPath) async {

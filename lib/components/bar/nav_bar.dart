@@ -7,6 +7,11 @@ import 'package:provider/provider.dart';
 class NavBar extends StatelessWidget {
   const NavBar({super.key});
 
+  void changePage(int p, int m) {
+    pageInfo.pInd = p;
+    pageInfo.mInd = m;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<PageInfo, Config>(
@@ -16,33 +21,26 @@ class NavBar extends StatelessWidget {
           children: [
             Column(
               children: [
-                _buildButton(Icons.home, () {
-                  pageInfo.pInd = 0;
-                  pageInfo.mInd = 0;
-                }),
-                _buildButton(Icons.menu, () {
-                  pageInfo.pInd = 0;
-                  pageInfo.mInd = 0;
-                }),
-                _buildButton(Icons.add, () {
-                  showDialog(context: context, builder: (context) => AddTask());
-                }),
+                _buildButton(Icons.home, () => changePage(0, 0)),
+                _buildButton(Icons.menu, () => changePage(0, 0)),
+                _buildButton(
+                  Icons.add,
+                  () => showDialog(
+                    context: context,
+                    builder: (context) => AddTask(),
+                  ),
+                ),
               ],
             ),
             Column(
               children: [
                 _buildButton(
                   config.darkMode ? Icons.light_mode : Icons.dark_mode,
-                  () {
-                    config.toggleTheme();
-                  },
+                  () => config.toggleTheme(),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: _buildButton(Icons.settings, () {
-                    pageInfo.pInd = 1;
-                    pageInfo.mInd = 0;
-                  }),
+                  child: _buildButton(Icons.settings, () => changePage(1, 0)),
                 ),
               ],
             ),
