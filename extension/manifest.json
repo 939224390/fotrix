@@ -1,0 +1,13 @@
+{
+    "name": "Fotrix Download Interceptor",
+    "version": "1.0",
+    "manifest_version": 3,
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "downloads",
+        "activeTab",
+        "tabs"
+    ]
+}
