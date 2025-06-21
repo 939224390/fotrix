@@ -19,12 +19,12 @@ void main() async {
     titleBarStyle: TitleBarStyle.hidden,
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.show();
-    await windowManager.focus();
+    await windowManager.hide();
+    // await windowManager.focus();
   });
 
-  aria2Client.start();
-  config.initConfig();
+  await aria2Client.start();
+  await config.loadConfig();
 
   runApp(
     MultiProvider(

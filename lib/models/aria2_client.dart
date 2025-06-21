@@ -62,20 +62,21 @@ class Aria2Client {
   }
 
   //启动aria2服务
-  void start() async {
-    if (!await Cross().isAria2Running()) {
-      _startAria2();
-    }
-    final isConnected = await checkConnection();
-    if (isConnected) {
-      if (kDebugMode) {
-        print('连接成功');
+  start() async {
+    while (true) {
+      if (!await Cross().isAria2Running()) {
+        _startAria2();
       }
-      taskList.checkDlList();
-    } else {
-      if (kDebugMode) {
-        print('连接失败');
+      final isConnected = await checkConnection();
+      if (isConnected) {
+        taskList.checkDlList();
+        return;
+      } else {
+        if (kDebugMode) {
+          print('连接失败');
+        }
       }
+      await Future.delayed(Duration(seconds: 5));
     }
   }
 

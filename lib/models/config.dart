@@ -26,11 +26,6 @@ class Config with ChangeNotifier {
     }
   }
 
-  void initConfig() {
-    launchAtStartup.setup(appName: 'Fotrix', appPath: Platform.executable);
-    loadConfig();
-  }
-
   // dark light
   final _themes = {
     'dark': {
@@ -59,6 +54,10 @@ class Config with ChangeNotifier {
 
   //读取配置文件
   Future<void> loadConfig() async {
+    launchAtStartup.setup(
+      appName: 'Fotrix',
+      appPath: Platform.resolvedExecutable,
+    );
     Cross().createConfig();
     final configPath = "${await Cross().getDocPath()}/config.json";
     final jsonString = await File(configPath).readAsString();

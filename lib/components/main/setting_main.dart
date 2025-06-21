@@ -13,7 +13,8 @@ class SettingMain extends StatefulWidget {
 
 class _SettingMainState extends State<SettingMain> {
   final TextEditingController _thCtrler = TextEditingController();
-
+  String _tmpPath = config.savePath;
+  bool pb = config.powerBoot;
   @override
   void initState() {
     super.initState();
@@ -21,16 +22,15 @@ class _SettingMainState extends State<SettingMain> {
   }
 
   void _initialValues() async {
-    await config.loadConfig();
     _thCtrler.text = config.threadCount.toString();
+    _tmpPath = config.savePath;
+    pb = config.powerBoot;
   }
 
-  String _tmpPath = config.savePath;
-  bool pb = config.powerBoot;
   @override
   Widget build(BuildContext context) {
     return Consumer<Config>(
-      builder: (context, conf, child) {
+      builder: (context, config, child) {
         return Column(
           children: [
             buildTitle("设置"),
@@ -74,7 +74,7 @@ class _SettingMainState extends State<SettingMain> {
                           Expanded(
                             child: ElevatedButton(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: conf.getColor("main"),
+                                backgroundColor: config.getColor("main"),
                                 elevation: 0,
                                 side: BorderSide.none,
                               ),
