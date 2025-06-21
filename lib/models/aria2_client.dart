@@ -1,12 +1,9 @@
 import "dart:convert";
 import "dart:io";
 import "package:flutter/foundation.dart";
-import "package:flutter/services.dart";
+import "package:fotrix/components/common/cross.dart";
 import "package:fotrix/models/task_list.dart";
 import "package:http/http.dart" as http;
-import 'package:process_run/shell.dart';
-import "package:path_provider/path_provider.dart";
-import "package:process_run/process_run.dart";
 
 class Aria2Client {
   final String host;
@@ -17,6 +14,7 @@ class Aria2Client {
   Aria2Client({this.host = 'localhost', this.port = 16800, this.secret});
 
   String get _baseUrl => 'http://$host:$port/jsonrpc';
+
   //发送请求
   Future<dynamic> _sendRequest(
     String method, [
@@ -65,7 +63,7 @@ class Aria2Client {
 
   //启动aria2服务
   void start() async {
-    if (!await _isAria2Running()) {
+    if (!await Cross().isAria2Running()) {
       _startAria2();
     }
     final isConnected = await checkConnection();
@@ -125,21 +123,9 @@ class Aria2Client {
 
   //启动aria2
   void _startAria2() async {
-    //   final savePath = config.savePath;
+    await Cross().createAria2();
     // 获取应用文档目录
-    final appDocDir = await getApplicationDocumentsDirectory();
-    final aria2Path = '${appDocDir.path}/aria2/aria2c.exe';
-
-    // 确保 Aria2 可执行文件存在
-    if (!await File(aria2Path).exists()) {
-      // 从 assets 复制 Aria2 可执行文件到应用目录
-      await _copyAria2FromAssets(aria2Path);
-    }
-
-    // 给可执行文件添加执行权限
-    if (Platform.isLinux || Platform.isMacOS) {
-      await Shell().run('chmod +x $aria2Path');
-    }
+    final aria2Path = await Cross().getAria2Path();
 
     // 启动 Aria2 进程
     aria2Process = await Process.start(aria2Path, [
@@ -160,32 +146,3 @@ class Aria2Client {
 }
 
 Aria2Client aria2Client = Aria2Client();
-
-/// 从 assets 复制 Aria2 可执行文件到应用目录
-Future<void> _copyAria2FromAssets(String destinationPath) async {
-  final data = await rootBundle.load('assets/aria2/aria2c.exe');
-  final bytes = data.buffer.asUint8List();
-  await File(destinationPath).writeAsBytes(bytes);
-}
-
-/// 检查 aria2c 进程是否在运行
-Future<bool> _isAria2Running() async {
-  try {
-    late ProcessResult result;
-    if (Platform.isWindows) {
-      // Windows 系统使用 tasklist 命令
-      result = await Process.run('tasklist', []);
-      return result.stdout.toString().contains('aria2c.exe');
-    } else if (Platform.isLinux || Platform.isMacOS) {
-      // Linux 和 macOS 系统使用 ps 命令
-      result = await Process.run('ps', ['-A']);
-      return result.stdout.toString().contains('aria2c');
-    } else {
-      // 不支持的操作系统
-      return false;
-    }
-  } catch (e) {
-    debugPrint('检测 aria2c 进程时出错: $e');
-    return false;
-  }
-}

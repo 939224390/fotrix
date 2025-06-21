@@ -1,15 +1,14 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
+import 'package:fotrix/components/common/cross.dart';
 import 'dart:convert';
 import 'package:launch_at_startup/launch_at_startup.dart';
 
 class Config with ChangeNotifier {
   bool _darkMode = true;
   int _threadCount = 6;
-  String savePath = "D:\\Download\\tmp";
+  String savePath = "D:\\Download";
   bool _powerBoot = false;
-
-  final _configPath = "assets/config/config.json";
 
   bool get darkMode => _darkMode;
   int get threadCount => _threadCount;
@@ -60,37 +59,31 @@ class Config with ChangeNotifier {
 
   //读取配置文件
   Future<void> loadConfig() async {
-    try {
-      final file = File(_configPath);
-      if (await file.exists()) {
-        final jsonString = await file.readAsString();
-        final config = jsonDecode(jsonString);
-        savePath = config['savePath'] ?? savePath;
-        threadCount = config['threadCount'] ?? _threadCount;
-        _darkMode = config['darkMode'] ?? _darkMode;
-        powerBoot = config['powerBoot'] ?? _powerBoot;
-      }
-    } catch (e) {
-      debugPrint("读取配置信息失败");
-    }
+    Cross().createConfig();
+    final configPath = "${await Cross().getDocPath()}/config.json";
+    final jsonString = await File(configPath).readAsString();
+    final config = jsonDecode(jsonString);
+    savePath = config['savePath'] ?? savePath;
+    threadCount = config['threadCount'] ?? _threadCount;
+    _darkMode = config['darkMode'] ?? _darkMode;
+    powerBoot = config['powerBoot'] ?? _powerBoot;
+
     notifyListeners();
   }
 
   //保存配置文件
   Future<void> saveConfig() async {
-    try {
-      final file = File(_configPath);
-      await file.writeAsString(
-        jsonEncode({
-          'savePath': savePath,
-          'threadCount': threadCount,
-          'darkMode': darkMode,
-          'powerBoot': powerBoot,
-        }),
-      );
-    } catch (e) {
-      debugPrint('Error saving config: $e');
-    }
+    final configPath = "${await Cross().getDocPath()}/config.json";
+    final file = File(configPath);
+    await file.writeAsString(
+      jsonEncode({
+        'savePath': savePath,
+        'threadCount': threadCount,
+        'darkMode': darkMode,
+        'powerBoot': powerBoot,
+      }),
+    );
+
     notifyListeners();
   }
 
