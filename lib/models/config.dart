@@ -9,6 +9,7 @@ class Config with ChangeNotifier {
   int _threadCount = 6;
   String savePath = "D:\\Download";
   bool _powerBoot = false;
+  int maxDown = 5;
 
   bool get darkMode => _darkMode;
   int get threadCount => _threadCount;
@@ -66,6 +67,7 @@ class Config with ChangeNotifier {
     threadCount = config['threadCount'] ?? _threadCount;
     _darkMode = config['darkMode'] ?? _darkMode;
     powerBoot = config['powerBoot'] ?? _powerBoot;
+    maxDown = config['maxDown'] ?? maxDown;
 
     notifyListeners();
   }
@@ -80,6 +82,7 @@ class Config with ChangeNotifier {
         'threadCount': threadCount,
         'darkMode': darkMode,
         'powerBoot': powerBoot,
+        'maxDown': maxDown,
       }),
     );
 

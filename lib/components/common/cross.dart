@@ -24,6 +24,7 @@ class Cross {
     }
   }
 
+
   //获取aria2
   Future<ByteData> getAria2() async {
     if (Platform.isWindows) {

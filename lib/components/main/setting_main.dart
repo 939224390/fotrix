@@ -13,6 +13,7 @@ class SettingMain extends StatefulWidget {
 
 class _SettingMainState extends State<SettingMain> {
   final TextEditingController _thCtrler = TextEditingController();
+  final TextEditingController _mDCtrler = TextEditingController();
   String _tmpPath = config.savePath;
   bool pb = config.powerBoot;
   @override
@@ -23,6 +24,7 @@ class _SettingMainState extends State<SettingMain> {
 
   void _initialValues() async {
     _thCtrler.text = config.threadCount.toString();
+    _mDCtrler.text = config.maxDown.toString();
     _tmpPath = config.savePath;
     pb = config.powerBoot;
   }
@@ -41,91 +43,13 @@ class _SettingMainState extends State<SettingMain> {
                 children: [
                   Column(
                     children: [
-                      Row(
-                        children: [
-                          _buildSec("开机自启"),
-                          Switch(
-                            value: pb,
-                            onChanged: (v) {
-                              setState(() {
-                                pb = !pb;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          _buildSec("下载线程(1-64):"),
-                          Expanded(
-                            child: TextField(
-                              controller: _thCtrler,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          _buildSec("保存路径"),
-                          Expanded(
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: config.getColor("main"),
-                                elevation: 0,
-                                side: BorderSide.none,
-                              ),
-                              onPressed: _selectDirectory,
-                              child: Text(_tmpPath),
-                            ),
-                          ),
-                        ],
-                      ),
+                      _buildPowerBootSwitch(),
+                      _buildMaxDownload(),
+                      _buildThCount(),
+                      _buildSavePath(),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              config.threadCount = int.parse(_thCtrler.text);
-                              setState(() {
-                                _thCtrler.text = config.threadCount.toString();
-                                config.savePath = _tmpPath;
-                                config.powerBoot = pb;
-                              });
-                              final snackBar = SnackBar(content: Text("内容已保存"));
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(snackBar);
-                              config.saveConfig();
-                            },
-                            child: Text("保存"),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              setState(() {
-                                _thCtrler.text = config.threadCount.toString();
-                                _tmpPath = config.savePath;
-                                pb = config.powerBoot;
-                              });
-                            },
-                            child: Text("取消"),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  _buildSaveCanelButton(),
                 ],
               ),
             ),
@@ -137,6 +61,114 @@ class _SettingMainState extends State<SettingMain> {
 
   Widget _buildSec(String text) {
     return Padding(padding: const EdgeInsets.all(12), child: buildText(text));
+  }
+
+  Widget _buildPowerBootSwitch() {
+    return Row(
+      children: [
+        _buildSec("开机自启"),
+        Switch(
+          value: pb,
+          onChanged: (v) {
+            setState(() {
+              pb = !pb;
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMaxDownload() {
+    return Row(
+      children: [
+        _buildSec("同时最多下载数量:"),
+        Expanded(
+          child: TextField(
+            controller: _mDCtrler,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(border: InputBorder.none),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThCount() {
+    return Row(
+      children: [
+        _buildSec("下载线程(1-64):"),
+        Expanded(
+          child: TextField(
+            controller: _thCtrler,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(border: InputBorder.none),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSavePath() {
+    return Row(
+      children: [
+        _buildSec("保存路径"),
+        Expanded(
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: config.getColor("main"),
+              elevation: 0,
+              side: BorderSide.none,
+            ),
+            onPressed: _selectDirectory,
+            child: Text(_tmpPath),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSaveCanelButton() {
+    return Padding(
+      padding: const EdgeInsets.all(15.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                config.threadCount = int.parse(_thCtrler.text);
+                config.maxDown = int.parse(_mDCtrler.text);
+                setState(() {
+                  _thCtrler.text = config.threadCount.toString();
+                  _mDCtrler.text = config.maxDown.toString();
+                  config.savePath = _tmpPath;
+                  config.powerBoot = pb;
+                });
+                final snackBar = SnackBar(content: Text("内容已保存"));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                config.saveConfig();
+              },
+              child: Text("保存"),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _thCtrler.text = config.threadCount.toString();
+                  _tmpPath = config.savePath;
+                  pb = config.powerBoot;
+                });
+              },
+              child: Text("取消"),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _selectDirectory() async {

@@ -24,7 +24,6 @@ class TaskMain extends StatelessWidget {
                   // Need to Edit
                   Row(
                     children: [
-                      Icon(Icons.restart_alt),
                       IconButton(
                         onPressed: () => taskList.resumeAll(),
                         icon: Icon(Icons.play_arrow),

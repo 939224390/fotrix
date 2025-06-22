@@ -2,6 +2,7 @@ import "dart:convert";
 import "dart:io";
 import "package:flutter/foundation.dart";
 import "package:fotrix/components/common/cross.dart";
+import "package:fotrix/models/config.dart";
 import "package:fotrix/models/task_list.dart";
 import "package:http/http.dart" as http;
 
@@ -125,17 +126,22 @@ class Aria2Client {
   //启动aria2
   void _startAria2() async {
     await Cross().createAria2();
-    // 获取应用文档目录
+
+    // 获取应用目录
     final aria2Path = await Cross().getAria2Path();
+    final aria2ConfPath = await Cross().getAria2ConfPath();
 
     // 启动 Aria2 进程
     aria2Process = await Process.start(aria2Path, [
+      '--dir=${config.savePath}',
+      '--max-concurrent-downloads=${config.maxDown}',
+      '--max-connection-per-server=${config.threadCount}',
+      '--conf-path=$aria2ConfPath',
       '--rpc-listen-port=16800',
       '--enable-rpc',
       '--rpc-listen-all=true',
       '--rpc-allow-origin-all',
       '--save-session-interval=60',
-      '--max-concurrent-downloads=10',
       '--continue=true',
     ]);
   }
