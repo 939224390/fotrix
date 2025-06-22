@@ -22,7 +22,6 @@ void main() async {
     await windowManager.hide();
     // await windowManager.focus();
   });
-
   await aria2Client.start();
   await config.loadConfig();
 

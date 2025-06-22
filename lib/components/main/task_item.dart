@@ -1,6 +1,6 @@
 import "dart:io";
 import "package:flutter/material.dart";
-import "package:fotrix/components/common/common.dart";
+import "package:fotrix/utils/common.dart";
 import "package:fotrix/models/config.dart";
 import "package:fotrix/models/task.dart";
 import "package:fotrix/models/task_list.dart";
@@ -12,13 +12,12 @@ class TaskItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<Config,TaskList>(
-      builder: (context,config, taskList, child) {
+    return Consumer2<Config, TaskList>(
+      builder: (context, config, taskList, child) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-          child: Card(
-            color: config.getColor('card'),
-            child: ListTile(
+          child: buildTaskCard(
+            ListTile(
               leading: IconButton(
                 icon: _buildDownloadButton(task),
                 onPressed: () {

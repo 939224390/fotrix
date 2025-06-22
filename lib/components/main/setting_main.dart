@@ -1,6 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:fotrix/components/common/common.dart';
+import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/models/config.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +35,7 @@ class _SettingMainState extends State<SettingMain> {
       builder: (context, config, child) {
         return Column(
           children: [
-            buildTitle("设置"),
+            buildMainTitle("设置"),
             buildDivider(),
             Expanded(
               child: Column(
@@ -47,6 +47,7 @@ class _SettingMainState extends State<SettingMain> {
                       _buildMaxDownload(),
                       _buildThCount(),
                       _buildSavePath(),
+                      _buildAriaConneted(),
                     ],
                   ),
                   _buildSaveCanelButton(),
@@ -113,17 +114,16 @@ class _SettingMainState extends State<SettingMain> {
     return Row(
       children: [
         _buildSec("保存路径"),
-        Expanded(
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: config.getColor("main"),
-              elevation: 0,
-              side: BorderSide.none,
-            ),
-            onPressed: _selectDirectory,
-            child: Text(_tmpPath),
-          ),
-        ),
+        Expanded(child: buildSavePathBtn(_selectDirectory, Text(_tmpPath))),
+      ],
+    );
+  }
+
+  Widget _buildAriaConneted() {
+    return Row(
+      children: [
+        _buildSec("aria2连接状态"),
+        Text(config.aria2Connected ? "已连接" : "未连接"),
       ],
     );
   }

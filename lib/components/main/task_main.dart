@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/components/common/common.dart';
+import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/components/main/task_item.dart';
 import 'package:fotrix/models/page_info.dart';
 import 'package:fotrix/models/task_list.dart';
@@ -47,7 +47,7 @@ class TaskMain extends StatelessWidget {
 
   Widget _buildTitle(int index) {
     List title = ["下载中", "已暂停", "已完成"];
-    return buildTitle(title[index]);
+    return buildMainTitle(title[index]);
   }
 
   Widget _buildList() {

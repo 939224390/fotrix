@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:fotrix/components/common/common.dart";
+import "package:fotrix/utils/common.dart";
 import "package:fotrix/models/config.dart";
 import "package:provider/provider.dart";
 
@@ -20,17 +20,9 @@ class _AboutMainState extends State<AboutMain> {
           children: [
             Column(
               children: [
-                buildTitle("关于"),
+                buildMainTitle("关于"),
                 buildDivider(),
-                Text(
-                  "Fotrix",
-                  style: TextStyle(
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
-                    color: config.getColor("text"),
-                  ),
-                ),
-
+                buildXLText("fotrix"),
                 buildText("Fotrix 是一个基于 Flutter 开发的aria2下载工具"),
               ],
             ),
@@ -38,8 +30,8 @@ class _AboutMainState extends State<AboutMain> {
               padding: const EdgeInsets.only(bottom: 15),
               child: Column(
                 children: [
-                  buildText("Engine 1.37.0"),
-                  buildText("Version 0.0.1"),
+                  buildText("Aria2 Version: ${config.aria2Version}"),
+                  buildText("Version 0.1.0"),
                 ],
               ),
             ),

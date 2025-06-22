@@ -41,7 +41,6 @@ dependencies:
     path: ^1.9.1
     launch_at_startup: ^0.5.1
     provider: ^6.1.5
-    fluttertoast: ^8.2.12
     process_run: ^1.2.4
 
 dev_dependencies:

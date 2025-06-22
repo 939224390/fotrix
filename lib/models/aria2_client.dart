@@ -1,7 +1,6 @@
 import "dart:convert";
 import "dart:io";
-import "package:flutter/foundation.dart";
-import "package:fotrix/components/common/cross.dart";
+import "package:fotrix/utils/cross.dart";
 import "package:fotrix/models/config.dart";
 import "package:fotrix/models/task_list.dart";
 import "package:http/http.dart" as http;
@@ -52,12 +51,10 @@ class Aria2Client {
   //检查连接状态
   Future<bool> checkConnection() async {
     try {
-      await _sendRequest('aria2.getVersion');
+      final v = await _sendRequest('aria2.getVersion');
+      config.aria2Version = v["version"];
       return true;
     } catch (e) {
-      if (kDebugMode) {
-        print('连接检查失败: $e');
-      }
       return false;
     }
   }
@@ -70,12 +67,11 @@ class Aria2Client {
       }
       final isConnected = await checkConnection();
       if (isConnected) {
+        config.aria2Connected = true;
         taskList.checkDlList();
         return;
       } else {
-        if (kDebugMode) {
-          print('连接失败');
-        }
+        config.aria2Connected = false;
       }
       await Future.delayed(Duration(seconds: 5));
     }

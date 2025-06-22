@@ -4,8 +4,8 @@ import 'package:fotrix/models/page_info.dart';
 import 'package:fotrix/models/tray_service.dart';
 import 'package:fotrix/pages/setting_page.dart';
 import 'package:fotrix/pages/task_page.dart';
-import 'package:fotrix/components/window_control.dart';
 import 'package:fotrix/models/config.dart';
+import 'package:fotrix/utils/common.dart';
 import 'package:provider/provider.dart';
 import 'package:tray_manager/tray_manager.dart';
 
@@ -46,16 +46,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
         return Scaffold(
           body: Row(
             children: [
-              Container(
-                color: config.getColor("side"),
-                width: 75,
-                child: Column(
-                  children: [
-                    WindowControl(mode: "move"),
-                    Expanded(child: NavBar()),
-                  ],
-                ),
-              ),
+              buildNavBarContainer(NavBar()),
               Expanded(
                 child: IndexedStack(
                   index: pageInfo.pInd,

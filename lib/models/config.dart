@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
-import 'package:fotrix/components/common/cross.dart';
+import 'package:fotrix/utils/cross.dart';
 import 'dart:convert';
 import 'package:launch_at_startup/launch_at_startup.dart';
 
@@ -10,10 +10,15 @@ class Config with ChangeNotifier {
   String savePath = "D:\\Download";
   bool _powerBoot = false;
   int maxDown = 5;
+  String _aria2Version = "";
+  bool _aria2Connected = false;
 
   bool get darkMode => _darkMode;
   int get threadCount => _threadCount;
   bool get powerBoot => _powerBoot;
+  String get aria2Version => _aria2Version;
+  bool get aria2Connected => _aria2Connected;
+
   set threadCount(int count) {
     _threadCount = (count < 64 && count >= 0) ? count : 1;
   }
@@ -27,19 +32,29 @@ class Config with ChangeNotifier {
     }
   }
 
+  set aria2Version(String value) {
+    _aria2Version = value;
+    notifyListeners();
+  }
+
+  set aria2Connected(bool value) {
+    _aria2Connected = value;
+    notifyListeners();
+  }
+
   // dark light
   final _themes = {
     'dark': {
-      'side': 0xff191919,
-      'bar': 0xFF2D2D2D,
+      'nav': 0xff191919,
+      'side': 0xFF2D2D2D,
       'main': 0xFF343434,
       'text': 0xFFFFFFFF,
       'card': 0xFF2D2D2D,
       'button': {'default': 0xFF2D2D2D, 'active': 0xFF444444},
     },
     'light': {
-      'side': 0xFF333333,
-      'bar': 0xFFF4F5F7,
+      'nav': 0xFF333333,
+      'side': 0xFFF4F5F7,
       'main': 0xFFF8F8F8,
       'text': 0xFF000000,
       'card': 0xFFFFFFFF,

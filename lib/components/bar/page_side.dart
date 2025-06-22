@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/components/common/common.dart';
+import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/models/config.dart';
 import 'package:fotrix/models/page_info.dart';
 import 'package:provider/provider.dart';
@@ -24,11 +24,11 @@ class _PageSideState extends State<PageSide> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PageInfo>(
-      builder: (context, pageInfo, child) {
+    return Consumer2<Config, PageInfo>(
+      builder: (context, config, pageInfo, child) {
         return Column(
           children: [
-            _buildSideTitle(title[pageInfo.pInd]),
+            buildSideTitle(title[pageInfo.pInd]),
             SizedBox(height: 30),
             Padding(
               padding: const EdgeInsets.all(12),
@@ -45,20 +45,6 @@ class _PageSideState extends State<PageSide> {
               ),
             ),
           ],
-        );
-      },
-    );
-  }
-
-  Widget _buildSideTitle(String text) {
-    return Consumer<Config>(
-      builder: (context, config, child) {
-        return Padding(
-          padding: const EdgeInsets.only(top: 20),
-          child: Text(
-            text,
-            style: TextStyle(color: config.getColor("text"), fontSize: 20),
-          ),
         );
       },
     );

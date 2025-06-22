@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:fotrix/models/aria2_client.dart';
 import 'package:fotrix/models/config.dart';
 import 'task.dart';
@@ -10,30 +9,39 @@ class TaskList with ChangeNotifier {
   final List<Task> _downloading = [];
   final List<Task> _paused = [];
   final List<Task> _completed = [];
+  final List<Task> _waiting = [];
 
   List<Task> get downloading => _downloading;
   List<Task> get paused => _paused;
   List<Task> get completed => _completed;
+  List<Task> get waiting => _waiting;
 
   final a2c = aria2Client;
 
   //创建任务
-  void createTask(String url) async {
+  Future<bool> createTask(String url) async {
     if ([
       ...downloading,
       ...paused,
       ...completed,
     ].any((element) => element.url == url)) {
-      debugPrint("任务已存在");
-      return;
+      return false;
     }
+
+    //创建任务后加入等待队列
     final gid = await a2c.addTask(url);
-
     final task = await _initialTask(url, gid);
-
     downloading.add(task);
+    // waiting.add(task);
+
+    // if (downloading.length < config.maxDown) {
+    //   waiting.remove(task);
+    //   downloading.add(task);
+    // }
+
     checkTaskStatus();
     refesh();
+    return true;
   }
 
   //检查下载列表
