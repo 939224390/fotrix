@@ -24,6 +24,10 @@ class Cross {
     }
   }
 
+  createList() async {
+
+  }
+
 
   //获取aria2
   Future<ByteData> getAria2() async {
@@ -72,6 +76,7 @@ class Cross {
 
       await aria2.create();
       await aria2Conf.create();
+
       //将aria2从asset复制出来
       ByteData aria2Data = await Cross().getAria2();
       ByteData aria2ConfData = await Cross().getAria2Conf();

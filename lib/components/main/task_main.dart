@@ -19,9 +19,9 @@ class TaskMain extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildTitle(pageInfo.mInd),
-
-                  // Need to Edit
+                  buildMainTitle(
+                    pageInfo.sideBtn[pageInfo.pInd][pageInfo.mInd],
+                  ),
                   Row(
                     children: [
                       IconButton(
@@ -45,13 +45,13 @@ class TaskMain extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(int index) {
-    List title = ["下载中", "已暂停", "已完成"];
-    return buildMainTitle(title[index]);
-  }
-
   Widget _buildList() {
-    final list = [taskList.downloading, taskList.paused, taskList.completed];
+    final list = [
+      taskList.active,
+      taskList.waiting,
+      taskList.paused,
+      taskList.complete,
+    ];
     return ListView.builder(
       shrinkWrap: true,
       itemCount: list[pageInfo.mInd].length,

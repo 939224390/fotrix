@@ -1,4 +1,4 @@
-enum TaskStatus { downloading, paused, completed, waiting }
+enum TaskStatus { active, paused, complete, waiting, remove }
 
 class Task {
   String gid;

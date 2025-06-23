@@ -6,6 +6,16 @@ class PageInfo with ChangeNotifier {
   // 主页面索引
   int _mInd = 0;
 
+  List<String> sideTitle = ["任务列表", "设置"];
+  List<List<String>> sideBtn = [
+    ["下载中", "等待中", "已暂停", "已完成"],
+    ["设置", "关于"],
+  ];
+  List<List> sideBtnIcon = [
+    [Icons.play_arrow, Icons.stop, Icons.pause, Icons.download_done],
+    [Icons.settings, Icons.report],
+  ];
+
   int get pInd => _pInd;
   int get mInd => _mInd;
 

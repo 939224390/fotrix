@@ -42,9 +42,10 @@ class Aria2Client {
       if (jsonResponse.containsKey('error')) {
         throw Exception('Aria2 error: ${jsonResponse['error']['message']}');
       }
-      return jsonResponse['result'];
+      final result = jsonResponse['result'];
+      return result;
     } else {
-      throw Exception('Failed to send request: ${response.statusCode}');
+      throw Exception('Failed to send request: ${response.body}');
     }
   }
 
@@ -68,7 +69,7 @@ class Aria2Client {
       final isConnected = await checkConnection();
       if (isConnected) {
         config.aria2Connected = true;
-        taskList.checkDlList();
+        await taskList.start();
         return;
       } else {
         config.aria2Connected = false;
@@ -87,6 +88,15 @@ class Aria2Client {
   //获取下载列表
   Future<List<dynamic>> tellActive() async {
     return await _sendRequest('aria2.tellActive');
+  }
+
+  //获取暂停列表
+  Future<List<dynamic>> tellPaused(int start, int num) async {
+    return await _sendRequest('aria2.tellStopped', [start, num]);
+  }
+
+  Future<List<dynamic>> tellWaiting(int start, int num) async {
+    return await _sendRequest('aria2.tellWaiting', [start, num]);
   }
 
   // 获取下载状态

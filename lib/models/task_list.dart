@@ -6,99 +6,131 @@ import 'task.dart';
 import 'package:flutter/material.dart';
 
 class TaskList with ChangeNotifier {
-  final List<Task> _downloading = [];
+  //任务队列
+  final List<Task> _active = [];
   final List<Task> _paused = [];
-  final List<Task> _completed = [];
+  final List<Task> _complete = [];
   final List<Task> _waiting = [];
 
-  List<Task> get downloading => _downloading;
+  List<Task> get active => _active;
   List<Task> get paused => _paused;
-  List<Task> get completed => _completed;
+  List<Task> get complete => _complete;
   List<Task> get waiting => _waiting;
 
   final a2c = aria2Client;
 
+  start() async {
+    await checkActive();
+    await checkWaiting();
+    await Future.delayed(Duration(seconds: 2));
+    start();
+  }
+
   //创建任务
   Future<bool> createTask(String url) async {
-    if ([
-      ...downloading,
-      ...paused,
-      ...completed,
-    ].any((element) => element.url == url)) {
+    final list = [...active, ...paused, ...complete, ...waiting];
+    if (list.any((element) => element.url == url)) {
       return false;
     }
 
     //创建任务后加入等待队列
     final gid = await a2c.addTask(url);
-    final task = await _initialTask(url, gid);
-    downloading.add(task);
-    // waiting.add(task);
+    final task = await _initialTask(url, gid, TaskStatus.waiting);
 
-    // if (downloading.length < config.maxDown) {
-    //   waiting.remove(task);
-    //   downloading.add(task);
-    // }
+    _waiting.add(task);
 
-    checkTaskStatus();
+    await checkWaiting();
+
     refesh();
+
     return true;
   }
 
-  //检查下载列表
-  void checkDlList() async {
+  //更新下载列表
+  checkActive() async {
     final dlList = await a2c.tellActive();
-    for (var dl in dlList) {
-      final gid = dl['gid'];
-      if (!downloading.any((element) => element.gid == gid)) {
-        final task = await _initialTask(dl['files'][0]['uris'][0]['uri'], gid);
-        downloading.add(task);
-        checkTaskStatus();
+    if (dlList.isNotEmpty) {
+      for (var dl in dlList) {
+        final gid = dl['gid'];
+        if (!active.any((element) => element.gid == gid)) {
+          final task = await _initialTask(
+            dl['files'][0]['uris'][0]['uri'],
+            gid,
+            TaskStatus.active,
+          );
+          active.add(task);
+          checkTaskStatus(task);
+        }
       }
     }
-    await Future.delayed(Duration(seconds: 1));
-    checkDlList();
+
     refesh();
   }
 
-  //检查暂停列表
-  void checkStopList() async {}
-
-  //监听任务状态
-  void checkTaskStatus() async {
-    final taskCopy = List<Task>.from(downloading);
-    if (downloading.isNotEmpty) {
-      for (var task in taskCopy) {
-        if (task.status == TaskStatus.downloading) {
-          final status = await a2c.tellStatus(task.gid);
-          task.completedLength = int.parse(status['completedLength'] ?? 0);
-          task.totalLength = int.parse(status['totalLength'] ?? 0);
-          task.downloadSpeed = double.parse(status['downloadSpeed'] ?? 0);
-          refesh();
-          if (task.completedLength == task.totalLength) {
-            completeTask(task);
+  //更新等待列表
+  checkWaiting() async {
+    final unActice = await a2c.tellWaiting(0, 100);
+    if (unActice.isNotEmpty) {
+      for (var un in unActice) {
+        final gid = un['gid'];
+        if (!waiting.any((element) => element.gid == gid)) {
+          if (un['status'] == 'waiting') {
+            final task = await _initialTask(
+              un['files'][0]['uris'][0]['uri'],
+              gid,
+              TaskStatus.waiting,
+            );
+            waiting.add(task);
           }
         }
       }
-      await Future.delayed(Duration(seconds: 1));
-      checkTaskStatus();
     }
-    return;
+    final wList = List<Task>.from(waiting);
+    for (var task in wList) {
+      if (!active.any((element) => element.gid == task.gid)) {
+        setTaskStatus(task, TaskStatus.active);
+        waiting.remove(task);
+      }
+    }
+    refesh();
+  }
+
+  //监听任务状态
+  void checkTaskStatus(Task task) async {
+    if (task.status == TaskStatus.active) {
+      final status = await a2c.tellStatus(task.gid);
+      task.completedLength = int.parse(status['completedLength'] ?? 0);
+      task.totalLength = int.parse(status['totalLength'] ?? 0);
+      task.downloadSpeed = double.parse(status['downloadSpeed'] ?? 0);
+      refesh();
+      if (task.completedLength == task.totalLength) {
+        completeTask(task);
+        refesh();
+        return;
+      }
+    }
+    await Future.delayed(Duration(seconds: 1));
+    checkTaskStatus(task);
+  }
+
+  List<int> getTaskNum() {
+    return [active.length, waiting.length, paused.length, complete.length];
   }
 
   // 暂停任务
   void stopTask(Task task) async {
-    task.status = TaskStatus.paused;
+    setTaskStatus(task, TaskStatus.paused);
+
     await a2c.pauseTask(task.gid);
-    paused.add(task);
+
     refesh();
   }
 
   //暂停所有任务
   void stopAll() async {
     await a2c.pauseAll();
-    for (var task in downloading) {
-      task.status = TaskStatus.paused;
-      paused.add(task);
+    for (var task in active) {
+      setTaskStatus(task, TaskStatus.paused);
     }
 
     refesh();
@@ -106,9 +138,10 @@ class TaskList with ChangeNotifier {
 
   //继续任务
   void resumeTask(Task task) async {
-    task.status = TaskStatus.downloading;
+    setTaskStatus(task, TaskStatus.waiting);
+
     await a2c.resumeTask(task.gid);
-    paused.remove(task);
+
     refesh();
   }
 
@@ -118,9 +151,7 @@ class TaskList with ChangeNotifier {
     final copyPaused = List<Task>.from(paused);
 
     for (var task in copyPaused) {
-      task.status = TaskStatus.downloading;
-      downloading.add(task);
-      paused.remove(task);
+      setTaskStatus(task, TaskStatus.waiting);
     }
 
     refesh();
@@ -128,20 +159,18 @@ class TaskList with ChangeNotifier {
 
   //任务完成
   void completeTask(Task task) {
-    task.status = TaskStatus.completed;
+    setTaskStatus(task, TaskStatus.complete);
 
-    downloading.remove(task);
-    paused.remove(task);
-    completed.add(task);
     refesh();
   }
 
-  //删除任务(*无法删除aria2文件)
+  //删除任务
   void deleteTask(Task task) async {
-    await a2c.removeTask(task.gid);
-    downloading.remove(task);
-    paused.remove(task);
-    completed.remove(task);
+    if (task.status != TaskStatus.complete) {
+      await a2c.removeTask(task.gid);
+    }
+    setTaskStatus(task, TaskStatus.remove);
+
     if (await File(task.tmpPath).exists()) File(task.tmpPath).delete();
     if (await File(task.savePath).exists()) File(task.savePath).delete();
 
@@ -152,8 +181,49 @@ class TaskList with ChangeNotifier {
     notifyListeners();
   }
 
+  void setTaskStatus(Task task, TaskStatus taskStatus) {
+    switch (taskStatus) {
+      case TaskStatus.waiting:
+        task.status = TaskStatus.waiting;
+        active.remove(task);
+        paused.remove(task);
+        // waiting.add(task);
+        break;
+      case TaskStatus.active:
+        task.status = TaskStatus.active;
+        paused.remove(task);
+        waiting.remove(task);
+        // active.add(task);
+        break;
+      case TaskStatus.paused:
+        task.status = TaskStatus.paused;
+        active.remove(task);
+        waiting.remove(task);
+        paused.add(task);
+        break;
+      case TaskStatus.complete:
+        task.status = TaskStatus.complete;
+        active.remove(task);
+        paused.remove(task);
+        waiting.remove(task);
+        complete.add(task);
+        break;
+      case TaskStatus.remove:
+        task.status = TaskStatus.remove;
+        active.remove(task);
+        paused.remove(task);
+        waiting.remove(task);
+        complete.remove(task);
+        break;
+    }
+  }
+
   //初始化任务
-  Future<Task> _initialTask(String url, String gid) async {
+  Future<Task> _initialTask(
+    String url,
+    String gid,
+    TaskStatus taskStatus,
+  ) async {
     final status = await a2c.tellStatus(gid);
     final fileName = _getFileName(status);
     final savePath = "${config.savePath}/$fileName";
@@ -169,7 +239,7 @@ class TaskList with ChangeNotifier {
       completedLength: completedLength,
       totalLength: totalLength,
       downloadSpeed: downloadSpeed,
-      status: TaskStatus.downloading,
+      status: taskStatus,
     );
     return task;
   }

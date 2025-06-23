@@ -42,6 +42,7 @@ dependencies:
     launch_at_startup: ^0.5.1
     provider: ^6.1.5
     process_run: ^1.2.4
+    signals: ^6.0.2
 
 dev_dependencies:
     flutter_test:

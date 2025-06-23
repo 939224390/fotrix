@@ -21,8 +21,9 @@ class TaskItem extends StatelessWidget {
               leading: IconButton(
                 icon: _buildDownloadButton(task),
                 onPressed: () {
-                  if (task.status == TaskStatus.downloading) {
+                  if (task.status == TaskStatus.active) {
                     taskList.stopTask(task);
+                  } else if (task.status == TaskStatus.waiting) {
                   } else if (task.status == TaskStatus.paused) {
                     taskList.resumeTask(task);
                   } else {
@@ -50,7 +51,7 @@ class TaskItem extends StatelessWidget {
   }
 
   Widget _buildSizePart(Task task) {
-    if (task.status == TaskStatus.downloading) {
+    if (task.status == TaskStatus.active) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -67,8 +68,10 @@ class TaskItem extends StatelessWidget {
   }
 
   Widget _buildDownloadButton(Task task) {
-    if (task.status == TaskStatus.downloading) {
+    if (task.status == TaskStatus.active) {
       return Icon(Icons.file_download);
+    } else if (task.status == TaskStatus.waiting) {
+      return Icon(Icons.stop);
     } else if (task.status == TaskStatus.paused) {
       return Icon(Icons.stop);
     } else {
