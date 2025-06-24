@@ -20,8 +20,11 @@ class TaskList with ChangeNotifier {
   final a2c = aria2Client;
 
   start() async {
+    config.aria2Connected = await a2c.checkConnection();
+
     await checkActive();
     await checkWaiting();
+    refesh();
     await Future.delayed(Duration(seconds: 2));
     start();
   }
@@ -64,7 +67,7 @@ class TaskList with ChangeNotifier {
       }
     }
 
-    refesh();
+    // refesh();
   }
 
   //更新等待列表
@@ -92,7 +95,7 @@ class TaskList with ChangeNotifier {
         waiting.remove(task);
       }
     }
-    refesh();
+    // refesh();
   }
 
   //监听任务状态
@@ -108,9 +111,9 @@ class TaskList with ChangeNotifier {
         refesh();
         return;
       }
+      await Future.delayed(Duration(seconds: 1));
+      checkTaskStatus(task);
     }
-    await Future.delayed(Duration(seconds: 1));
-    checkTaskStatus(task);
   }
 
   List<int> getTaskNum() {

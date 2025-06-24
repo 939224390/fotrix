@@ -62,20 +62,10 @@ class Aria2Client {
 
   //启动aria2服务
   start() async {
-    while (true) {
-      if (!await Cross().isAria2Running()) {
-        _startAria2();
-      }
-      final isConnected = await checkConnection();
-      if (isConnected) {
-        config.aria2Connected = true;
-        await taskList.start();
-        return;
-      } else {
-        config.aria2Connected = false;
-      }
-      await Future.delayed(Duration(seconds: 5));
+    if (!await Cross().isAria2Running()) {
+      _startAria2();
     }
+    await taskList.start();
   }
 
   //添加任务
@@ -153,7 +143,7 @@ class Aria2Client {
   }
 
   //关闭aria2服务
-  void shutdownAria2() {
+  shutdownAria2() {
     aria2Process?.kill();
   }
 }

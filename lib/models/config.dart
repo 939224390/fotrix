@@ -10,8 +10,8 @@ class Config with ChangeNotifier {
   String savePath = "D:\\Download";
   bool _powerBoot = false;
   int maxDown = 5;
-  String _aria2Version = "";
-  bool _aria2Connected = false;
+  late String _aria2Version = "";
+  late bool _aria2Connected = false;
 
   bool get darkMode => _darkMode;
   int get threadCount => _threadCount;
