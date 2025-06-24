@@ -76,7 +76,8 @@ flutter:
 
     assets:
         - assets/images/icon.ico
-        - assets/aria2/
+        - assets/aria2/win/
+        - assets/aria2/linux/
 
     # To add assets to your application, add an assets section, like this:
     # assets:

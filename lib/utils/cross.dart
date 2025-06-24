@@ -16,18 +16,15 @@ class Cross {
     final dir = Directory(await getDocPath());
     final file = File('${await getDocPath()}/config.json');
     if (!await dir.exists()) {
-      dir.create();
+      await dir.create();
     }
     if (!await file.exists()) {
-      file.create();
+      await file.create();
       await config.saveConfig();
     }
   }
 
-  createList() async {
-
-  }
-
+  createList() async {}
 
   //获取aria2
   Future<ByteData> getAria2() async {

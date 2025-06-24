@@ -63,7 +63,7 @@ class Aria2Client {
   //启动aria2服务
   start() async {
     if (!await Cross().isAria2Running()) {
-      _startAria2();
+      await _startAria2();
     }
     await taskList.start();
   }
@@ -80,11 +80,7 @@ class Aria2Client {
     return await _sendRequest('aria2.tellActive');
   }
 
-  //获取暂停列表
-  Future<List<dynamic>> tellPaused(int start, int num) async {
-    return await _sendRequest('aria2.tellStopped', [start, num]);
-  }
-
+  //获取等待列表
   Future<List<dynamic>> tellWaiting(int start, int num) async {
     return await _sendRequest('aria2.tellWaiting', [start, num]);
   }
@@ -120,7 +116,7 @@ class Aria2Client {
   }
 
   //启动aria2
-  void _startAria2() async {
+  _startAria2() async {
     await Cross().createAria2();
 
     // 获取应用目录

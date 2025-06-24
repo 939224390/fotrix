@@ -74,7 +74,7 @@ class Config with ChangeNotifier {
       appName: 'Fotrix',
       appPath: Platform.resolvedExecutable,
     );
-    Cross().createConfig();
+    await Cross().createConfig();
     final configPath = "${await Cross().getDocPath()}/config.json";
     final jsonString = await File(configPath).readAsString();
     final config = jsonDecode(jsonString);
