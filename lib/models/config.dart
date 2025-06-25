@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'package:flutter/widgets.dart';
+import 'package:fotrix/models/logger.dart';
 import 'package:fotrix/utils/cross.dart';
 import 'dart:convert';
 import 'package:launch_at_startup/launch_at_startup.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class Config with ChangeNotifier {
   bool _darkMode = true;
@@ -70,10 +72,12 @@ class Config with ChangeNotifier {
 
   //读取配置文件
   Future<void> loadConfig() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
     launchAtStartup.setup(
-      appName: 'Fotrix',
+      appName: packageInfo.appName,
       appPath: Platform.resolvedExecutable,
     );
+
     await Cross().createConfig();
     final configPath = "${await Cross().getDocPath()}/config.json";
     final jsonString = await File(configPath).readAsString();
@@ -84,7 +88,10 @@ class Config with ChangeNotifier {
     powerBoot = config['powerBoot'] ?? _powerBoot;
     maxDown = config['maxDown'] ?? maxDown;
 
+    await runLog.log("加载配置文件");
+
     notifyListeners();
+    await runLog.log("通知页面刷新");
   }
 
   //保存配置文件

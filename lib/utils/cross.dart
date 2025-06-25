@@ -11,6 +11,15 @@ class Cross {
     return '${appDocDir.path}/fotrix';
   }
 
+  //创建日志文件
+  Future<String> createLog() async {
+    final file = File('${await getDocPath()}/log.txt');
+    if (!await file.exists()) {
+      await file.create();
+    }
+    return '${await getDocPath()}/log.txt';
+  }
+
   //创建配置文件件
   createConfig() async {
     final dir = Directory(await getDocPath());

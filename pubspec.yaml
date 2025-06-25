@@ -43,6 +43,7 @@ dependencies:
     provider: ^6.1.5
     process_run: ^1.2.4
     signals: ^6.0.2
+    package_info_plus: ^8.3.0
 
 dev_dependencies:
     flutter_test:

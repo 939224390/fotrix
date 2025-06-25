@@ -44,7 +44,7 @@ class _AddTaskState extends State<AddTask> {
                     hintText: "请输入下载链接",
                     border: OutlineInputBorder(),
                   ),
-                  onSubmitted: (_) => _createDownloadTask(), // 回车触发
+                  //   onSubmitted: (_) => _createDownloadTask(), // 回车触发
                 ),
                 SizedBox(height: 16),
                 ElevatedButton(

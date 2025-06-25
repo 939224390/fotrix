@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:fotrix/models/aria2_client.dart';
 import 'package:fotrix/models/config.dart';
+import 'package:fotrix/models/logger.dart';
 import 'task.dart';
 import 'package:flutter/material.dart';
 
@@ -21,6 +22,7 @@ class TaskList with ChangeNotifier {
 
   start() async {
     config.aria2Connected = await a2c.checkConnection();
+    await runLog.log("Aria2连接状态: ${config.aria2Connected}");
 
     await checkActive();
     await checkWaiting();
@@ -117,7 +119,13 @@ class TaskList with ChangeNotifier {
   }
 
   List<int> getTaskNum() {
-    return [active.length, waiting.length, paused.length, complete.length];
+    final list = [
+      active.length,
+      waiting.length,
+      paused.length,
+      complete.length,
+    ];
+    return list;
   }
 
   // 暂停任务

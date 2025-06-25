@@ -1,5 +1,6 @@
 import "dart:convert";
 import "dart:io";
+import "package:fotrix/models/logger.dart";
 import "package:fotrix/utils/cross.dart";
 import "package:fotrix/models/config.dart";
 import "package:fotrix/models/task_list.dart";
@@ -43,8 +44,11 @@ class Aria2Client {
         throw Exception('Aria2 error: ${jsonResponse['error']['message']}');
       }
       final result = jsonResponse['result'];
+      await runLog.log(result.toString());
+
       return result;
     } else {
+      await runLog.log(response.body);
       throw Exception('Failed to send request: ${response.body}');
     }
   }
@@ -56,6 +60,7 @@ class Aria2Client {
       config.aria2Version = v["version"];
       return true;
     } catch (e) {
+      await runLog.log("Aria2连接失败: $e");
       return false;
     }
   }
@@ -63,8 +68,12 @@ class Aria2Client {
   //启动aria2服务
   start() async {
     if (!await Cross().isAria2Running()) {
+      runLog.log("Aria2服务未启动，正在启动");
       await _startAria2();
     }
+
+    await runLog.log("Aria2服务已启动");
+
     await taskList.start();
   }
 
@@ -117,11 +126,15 @@ class Aria2Client {
 
   //启动aria2
   _startAria2() async {
+    await runLog.log("执行创建aria2");
     await Cross().createAria2();
+    await runLog.log("创建Aria2目录");
 
     // 获取应用目录
     final aria2Path = await Cross().getAria2Path();
     final aria2ConfPath = await Cross().getAria2ConfPath();
+    await runLog.log("Aria2路径: $aria2Path");
+    await runLog.log("Aria2配置路径: $aria2ConfPath");
 
     // 启动 Aria2 进程
     aria2Process = await Process.start(aria2Path, [
@@ -136,6 +149,7 @@ class Aria2Client {
       '--save-session-interval=60',
       '--continue=true',
     ]);
+    await runLog.log("Aria2服务启动成功");
   }
 
   //关闭aria2服务

@@ -63,12 +63,36 @@ class _PageSideState extends State<PageSide> {
           elevation: 0,
           side: BorderSide.none,
         ),
-        child: Row(
-          children: [
-            Row(children: [buildIcon(icon), buildText(text)]),
-          ],
-        ),
+        child: _buildOption(text, icon, index, taskList),
       ),
     );
+  }
+
+  Widget _buildOption(
+    String text,
+    IconData icon,
+    int index,
+    TaskList taskList,
+  ) {
+    final num = taskList.getTaskNum()[index];
+    if (pageInfo.pInd == 0) {
+      return Row(
+        children: [
+          Row(
+            children: [
+              buildIcon(icon),
+              buildText(text),
+              buildText(num.toString()),
+            ],
+          ),
+        ],
+      );
+    } else {
+      return Row(
+        children: [
+          Row(children: [buildIcon(icon), buildText(text)]),
+        ],
+      );
+    }
   }
 }

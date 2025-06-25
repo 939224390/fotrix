@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/models/aria2_client.dart';
 import 'package:fotrix/models/config.dart';
+import 'package:fotrix/models/logger.dart';
 import 'package:fotrix/models/page_info.dart';
 import 'package:fotrix/models/task_list.dart';
 import 'package:fotrix/models/tray_service.dart';
@@ -10,6 +11,7 @@ import 'package:window_manager/window_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await windowManager.ensureInitialized();
   await ts.initTray();
   WindowOptions windowOptions = const WindowOptions(
@@ -19,11 +21,14 @@ void main() async {
     titleBarStyle: TitleBarStyle.hidden,
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
-    await windowManager.hide();
-    // await windowManager.focus();
+    // await windowManager.hide();
+    await windowManager.focus();
   });
+  await runLog.createLog();
   await config.loadConfig();
   await aria2Client.start();
+
+  await runLog.log("开始运行");
 
   runApp(
     MultiProvider(
