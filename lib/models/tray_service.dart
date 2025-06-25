@@ -19,7 +19,7 @@ class TrayService {
     await _tm.setContextMenu(
       Menu(
         items: [
-          MenuItem(label: '显示主界面', onClick: (_) => windowManager.show()),
+          MenuItem(label: 'Fotrix', onClick: (_) => windowManager.show()),
           MenuItem.separator(),
           MenuItem(
             label: '退出',

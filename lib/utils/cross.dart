@@ -4,6 +4,8 @@ import 'package:fotrix/models/config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:process_run/shell.dart';
 
+import '../models/logger.dart';
+
 class Cross {
   //获取配置路径
   Future<String> getDocPath() async {
@@ -22,14 +24,18 @@ class Cross {
 
   //创建配置文件件
   createConfig() async {
-    final dir = Directory(await getDocPath());
-    final file = File('${await getDocPath()}/config.json');
-    if (!await dir.exists()) {
-      await dir.create();
-    }
-    if (!await file.exists()) {
-      await file.create();
-      await config.saveConfig();
+    try {
+      final dir = Directory(await getDocPath());
+      final file = File('${await getDocPath()}/config.json');
+      if (!await dir.exists()) {
+        await dir.create();
+      }
+      if (!await file.exists()) {
+        await file.create();
+        await config.saveConfig();
+      }
+    } catch (e) {
+      await runLog.log("创建配置文件失败 $e");
     }
   }
 
@@ -104,7 +110,10 @@ class Cross {
       late ProcessResult result;
       if (Platform.isWindows) {
         // Windows 系统使用 tasklist 命令
-        result = await Process.run('tasklist', []);
+        result = await Process.run("tasklist", [
+          '/FI',
+          'IMAGENAME eq aria2c.exe',
+        ]);
         return result.stdout.toString().contains('aria2c.exe');
       } else if (Platform.isLinux || Platform.isMacOS) {
         // Linux 和 macOS 系统使用 ps 命令
@@ -115,6 +124,7 @@ class Cross {
         return false;
       }
     } catch (e) {
+      await runLog.log("检查Aria2进程失败: $e");
       return false;
     }
   }

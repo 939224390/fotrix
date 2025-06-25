@@ -22,7 +22,6 @@ class TaskList with ChangeNotifier {
 
   start() async {
     config.aria2Connected = await a2c.checkConnection();
-    await runLog.log("Aria2连接状态: ${config.aria2Connected}");
 
     await checkActive();
     await checkWaiting();
@@ -69,7 +68,6 @@ class TaskList with ChangeNotifier {
       }
     }
 
-    // refesh();
   }
 
   //更新等待列表

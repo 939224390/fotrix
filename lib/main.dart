@@ -28,8 +28,6 @@ void main() async {
   await config.loadConfig();
   await aria2Client.start();
 
-  await runLog.log("开始运行");
-
   runApp(
     MultiProvider(
       providers: [

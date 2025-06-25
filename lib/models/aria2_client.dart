@@ -16,6 +16,20 @@ class Aria2Client {
 
   String get _baseUrl => 'http://$host:$port/jsonrpc';
 
+  //启动aria2服务
+  start() async {
+    if (!await Cross().isAria2Running()) {
+      runLog.log("Aria2服务未启动，正在启动");
+      await _startAria2();
+    } else if (!await checkConnection()) {
+      await runLog.log("Aria2连接失败，正在重启");
+      await _startAria2();
+    }
+    await runLog.log("Aria2服务已启动");
+
+    await taskList.start();
+  }
+
   //发送请求
   Future<dynamic> _sendRequest(
     String method, [
@@ -31,50 +45,47 @@ class Aria2Client {
       'params': params,
       'id': 'flutter_aria2_client',
     });
+    try {
+      final response = await http.post(
+        Uri.parse(_baseUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: requestBody,
+      );
 
-    final response = await http.post(
-      Uri.parse(_baseUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: requestBody,
-    );
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        if (jsonResponse.containsKey('error')) {
+          throw Exception('Aria2 error: ${jsonResponse['error']['message']}');
+        }
+        final result = jsonResponse['result'];
 
-    if (response.statusCode == 200) {
-      final jsonResponse = jsonDecode(response.body);
-      if (jsonResponse.containsKey('error')) {
-        throw Exception('Aria2 error: ${jsonResponse['error']['message']}');
+        return result;
+      } else {
+        await runLog.log("Aria2请求失败: ${response.body}");
+        return -1;
       }
-      final result = jsonResponse['result'];
-      await runLog.log(result.toString());
-
-      return result;
-    } else {
-      await runLog.log(response.body);
-      throw Exception('Failed to send request: ${response.body}');
+    } catch (e) {
+      await runLog.log("Aria2请求失败: $e");
+      return -1;
     }
+  }
+
+  Future<String> getAria2Version() async {
+    final v = await _sendRequest('aria2.getVersion');
+    return v["version"];
   }
 
   //检查连接状态
   Future<bool> checkConnection() async {
     try {
-      final v = await _sendRequest('aria2.getVersion');
-      config.aria2Version = v["version"];
-      return true;
+      if (await _sendRequest('aria2.getVersion') != -1) {
+        return true;
+      }
+      return false;
     } catch (e) {
       await runLog.log("Aria2连接失败: $e");
       return false;
     }
-  }
-
-  //启动aria2服务
-  start() async {
-    if (!await Cross().isAria2Running()) {
-      runLog.log("Aria2服务未启动，正在启动");
-      await _startAria2();
-    }
-
-    await runLog.log("Aria2服务已启动");
-
-    await taskList.start();
   }
 
   //添加任务
@@ -126,34 +137,34 @@ class Aria2Client {
 
   //启动aria2
   _startAria2() async {
-    await runLog.log("执行创建aria2");
-    await Cross().createAria2();
-    await runLog.log("创建Aria2目录");
+    try {
+      await Cross().createAria2();
 
-    // 获取应用目录
-    final aria2Path = await Cross().getAria2Path();
-    final aria2ConfPath = await Cross().getAria2ConfPath();
-    await runLog.log("Aria2路径: $aria2Path");
-    await runLog.log("Aria2配置路径: $aria2ConfPath");
+      // 获取应用目录
+      final aria2Path = await Cross().getAria2Path();
+      final aria2ConfPath = await Cross().getAria2ConfPath();
 
-    // 启动 Aria2 进程
-    aria2Process = await Process.start(aria2Path, [
-      '--dir=${config.savePath}',
-      '--max-concurrent-downloads=${config.maxDown}',
-      '--max-connection-per-server=${config.threadCount}',
-      '--conf-path=$aria2ConfPath',
-      '--rpc-listen-port=16800',
-      '--enable-rpc',
-      '--rpc-listen-all=true',
-      '--rpc-allow-origin-all',
-      '--save-session-interval=60',
-      '--continue=true',
-    ]);
-    await runLog.log("Aria2服务启动成功");
+      // 启动 Aria2 进程
+      aria2Process = await Process.start(aria2Path, [
+        '--dir=${config.savePath}',
+        '--max-concurrent-downloads=${config.maxDown}',
+        '--max-connection-per-server=${config.threadCount}',
+        '--conf-path=$aria2ConfPath',
+        '--rpc-listen-port=16800',
+        '--enable-rpc',
+        '--rpc-listen-all=true',
+        '--rpc-allow-origin-all',
+        '--save-session-interval=60',
+        '--continue=true',
+      ]);
+      await runLog.log("Aria2服务启动成功");
+    } catch (e) {
+      runLog.log("Aria2服务启动失败 $e");
+    }
   }
 
   //关闭aria2服务
-  shutdownAria2() {
+  shutdownAria2() async {
     aria2Process?.kill();
   }
 }

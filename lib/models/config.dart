@@ -72,43 +72,50 @@ class Config with ChangeNotifier {
 
   //读取配置文件
   Future<void> loadConfig() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    launchAtStartup.setup(
-      appName: packageInfo.appName,
-      appPath: Platform.resolvedExecutable,
-    );
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      launchAtStartup.setup(
+        appName: packageInfo.appName,
+        appPath: Platform.resolvedExecutable,
+      );
 
-    await Cross().createConfig();
-    final configPath = "${await Cross().getDocPath()}/config.json";
-    final jsonString = await File(configPath).readAsString();
-    final config = jsonDecode(jsonString);
-    savePath = config['savePath'] ?? savePath;
-    threadCount = config['threadCount'] ?? _threadCount;
-    _darkMode = config['darkMode'] ?? _darkMode;
-    powerBoot = config['powerBoot'] ?? _powerBoot;
-    maxDown = config['maxDown'] ?? maxDown;
+      await Cross().createConfig();
+      final configPath = "${await Cross().getDocPath()}/config.json";
+      final jsonString = await File(configPath).readAsString();
+      final config = jsonDecode(jsonString);
+      savePath = config['savePath'] ?? savePath;
+      threadCount = config['threadCount'] ?? _threadCount;
+      _darkMode = config['darkMode'] ?? _darkMode;
+      powerBoot = config['powerBoot'] ?? _powerBoot;
+      maxDown = config['maxDown'] ?? maxDown;
 
-    await runLog.log("加载配置文件");
+      await runLog.log("加载配置文件");
 
-    notifyListeners();
-    await runLog.log("通知页面刷新");
+      notifyListeners();
+    } catch (e) {
+      await runLog.log("加载配置文件失败 $e");
+    }
   }
 
   //保存配置文件
   Future<void> saveConfig() async {
-    final configPath = "${await Cross().getDocPath()}/config.json";
-    final file = File(configPath);
-    await file.writeAsString(
-      jsonEncode({
-        'savePath': savePath,
-        'threadCount': threadCount,
-        'darkMode': darkMode,
-        'powerBoot': powerBoot,
-        'maxDown': maxDown,
-      }),
-    );
+    try {
+      final configPath = "${await Cross().getDocPath()}/config.json";
+      final file = File(configPath);
+      await file.writeAsString(
+        jsonEncode({
+          'savePath': savePath,
+          'threadCount': threadCount,
+          'darkMode': darkMode,
+          'powerBoot': powerBoot,
+          'maxDown': maxDown,
+        }),
+      );
 
-    notifyListeners();
+      notifyListeners();
+    } catch (e) {
+      await runLog.log("保存配置文件失败 $e");
+    }
   }
 
   //获取颜色
