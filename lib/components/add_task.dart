@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fotrix/models/config.dart';
 import 'package:fotrix/models/task_list.dart';
 import 'package:fotrix/utils/common.dart';
-import 'package:provider/provider.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
@@ -30,33 +30,32 @@ class _AddTaskState extends State<AddTask> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<TaskList>(
-      builder: (context, taskList, child) {
-        return buildAddTaskDialog([
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                TextField(
-                  controller: _urlCtrler,
-                  focusNode: _focusNode,
-                  decoration: InputDecoration(
-                    hintText: "请输入下载链接",
-                    border: OutlineInputBorder(),
-                  ),
-                  //   onSubmitted: (_) => _createDownloadTask(), // 回车触发
-                ),
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _createDownloadTask,
-                  child: Text("开始下载"),
-                ),
-              ],
+    return buildAddTaskDialog([
+      Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _urlCtrler,
+              focusNode: _focusNode,
+              decoration: InputDecoration(
+                hintText: "请输入下载链接",
+                border: OutlineInputBorder(),
+              ),
+              //   onSubmitted: (_) => _createDownloadTask(), // 回车触发
             ),
-          ),
-        ]);
-      },
-    );
+            SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorTheme.buttonColor.value,
+              ),
+              onPressed: _createDownloadTask,
+              child: Text("开始下载"),
+            ),
+          ],
+        ),
+      ),
+    ]);
   }
 
   //创建下载任务

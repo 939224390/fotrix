@@ -1,23 +1,83 @@
+import 'package:signals/signals.dart';
+
 enum TaskStatus { active, paused, complete, waiting, remove }
 
 class Task {
-  String gid;
-  String name;
-  String url;
-  String savePath;
-  int completedLength;
-  int totalLength;
-  double downloadSpeed;
-  TaskStatus status;
+  final Signal<String> gid;
+  final Signal<String> name;
+  final Signal<String> savePath;
+  final Signal<int> completedLength;
+  final Signal<String> url;
+  final Signal<int> totalLength;
+  final Signal<double> downloadSpeed;
+  final Signal<TaskStatus> status;
 
-  String get progress =>
-      totalLength != 0
-          ? "${((completedLength / totalLength) * 100).toStringAsFixed(0)}%"
-          : "0%";
-  String get dlSize => _formatSize(completedLength);
-  String get totalSize => _formatSize(totalLength);
-  String get formattedSpeed => _calculateSpeed(this);
-  String get remainTime => _calculateRemainingTime(this);
+  late final progress = computed(
+    () =>
+        totalLength.value != 0
+            ? "${((completedLength.value / totalLength.value) * 100).toStringAsFixed(0)}%"
+            : "0%",
+  );
+
+  late final dlSize = computed(() {
+    List units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    double res = completedLength.value.toDouble();
+    int i = 0;
+    for (i = 0; i < units.length; i++) {
+      if (res < 1024) {
+        break;
+      } else {
+        res = res / 1024;
+      }
+    }
+    return "${res.toStringAsFixed(2)} ${units[i]}";
+  });
+
+  late final totalSize = computed(() {
+    List units = ['B', 'KB', 'MB', 'GB', 'TB'];
+    double res = totalLength.value.toDouble();
+    int i = 0;
+    for (i = 0; i < units.length; i++) {
+      if (res < 1024) {
+        break;
+      } else {
+        res = res / 1024;
+      }
+    }
+    return "${res.toStringAsFixed(2)} ${units[i]}";
+  });
+
+  late final formattedSpeed = computed(() {
+    switch (downloadSpeed.value) {
+      case <= 0:
+        return "0 B/s";
+      case < 1024:
+        return "${downloadSpeed.value.toStringAsFixed(1)} B/s";
+      case < 1024 * 1024:
+        return "${(downloadSpeed.value / 1024).toStringAsFixed(1)} KB/s";
+
+      default:
+        return "${(downloadSpeed.value / (1024 * 1024)).toStringAsFixed(1)} MB/s";
+    }
+  });
+
+  late final remainTime = computed(() {
+    if (totalLength.value == 0 || downloadSpeed.value == 0) return "0";
+    final remainBytes = totalLength.value - completedLength.value;
+    final remainTime = (remainBytes / downloadSpeed.value).toInt();
+    if (remainTime < 60) {
+      return "$remainTime 秒";
+    } else if (remainTime < 60 * 60) {
+      return "${(remainTime / 60)} 分钟";
+    } else {
+      return "${(remainTime / 60 / 60)} 小时";
+    }
+  });
+
+  //   String get dlSize => _formatSize(completedLength.value);
+  //   String get totalSize => _formatSize(totalLength.value);
+  //   String get formattedSpeed => _calculateSpeed(this);
+  //   String get remainTime => _calculateRemainingTime(this);
 
   Task({
     required this.gid,
@@ -33,42 +93,43 @@ class Task {
   String get tmpPath => "$savePath.aria2";
 }
 
-String _calculateSpeed(Task task) {
-  switch (task.downloadSpeed) {
-    case <= 0:
-      return "0 B/s";
-    case < 1024:
-      return "${task.downloadSpeed.toStringAsFixed(1)} B/s";
-    case < 1024 * 1024:
-      return "${(task.downloadSpeed / 1024).toStringAsFixed(1)} KB/s";
-    default:
-      return "${(task.downloadSpeed / (1024 * 1024)).toStringAsFixed(1)} MB/s";
-  }
-}
+// String _calculateSpeed(Task task) {
+//   switch (task.downloadSpeed.value) {
+//     case <= 0:
+//       return "0 B/s";
+//     case < 1024:
+//       return "${task.downloadSpeed.value.toStringAsFixed(1)} B/s";
+//     case < 1024 * 1024:
+//       return "${(task.downloadSpeed.value / 1024).toStringAsFixed(1)} KB/s";
 
-String _calculateRemainingTime(Task task) {
-  if (task.totalLength == 0 || task.downloadSpeed == 0) return "0";
-  final remainBytes = task.totalLength - task.completedLength;
-  final remainTime = (remainBytes / task.downloadSpeed).toInt();
-  if (remainTime < 60) {
-    return "$remainTime 秒";
-  } else if (remainTime < 60 * 60) {
-    return "${(remainTime / 60)} 分钟";
-  } else {
-    return "${(remainTime / 60 / 60)} 小时";
-  }
-}
+//     default:
+//       return "${(task.downloadSpeed.value / (1024 * 1024)).toStringAsFixed(1)} MB/s";
+//   }
+// }
 
-String _formatSize(int size) {
-  List units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  double res = size.toDouble();
-  int i = 0;
-  for (i = 0; i < units.length; i++) {
-    if (res < 1024) {
-      break;
-    } else {
-      res = res / 1024;
-    }
-  }
-  return "${res.toStringAsFixed(2)} ${units[i]}";
-}
+// String _calculateRemainingTime(Task task) {
+//   if (task.totalLength.value == 0 || task.downloadSpeed.value == 0) return "0";
+//   final remainBytes = task.totalLength.value - task.completedLength.value;
+//   final remainTime = (remainBytes / task.downloadSpeed.value).toInt();
+//   if (remainTime < 60) {
+//     return "$remainTime 秒";
+//   } else if (remainTime < 60 * 60) {
+//     return "${(remainTime / 60)} 分钟";
+//   } else {
+//     return "${(remainTime / 60 / 60)} 小时";
+//   }
+// }
+
+// String _formatSize(int size) {
+//   List units = ['B', 'KB', 'MB', 'GB', 'TB'];
+//   double res = size.toDouble();
+//   int i = 0;
+//   for (i = 0; i < units.length; i++) {
+//     if (res < 1024) {
+//       break;
+//     } else {
+//       res = res / 1024;
+//     }
+//   }
+//   return "${res.toStringAsFixed(2)} ${units[i]}";
+// }

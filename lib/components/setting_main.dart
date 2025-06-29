@@ -2,7 +2,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/models/config.dart';
-import 'package:provider/provider.dart';
 
 class SettingMain extends StatefulWidget {
   const SettingMain({super.key});
@@ -31,32 +30,28 @@ class _SettingMainState extends State<SettingMain> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Config>(
-      builder: (context, config, child) {
-        return Column(
-          children: [
-            buildMainTitle("设置"),
-            buildDivider(),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      children: [
+        buildMainTitle("设置"),
+        buildDivider(),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
                 children: [
-                  Column(
-                    children: [
-                      _buildPowerBootSwitch(),
-                      _buildMaxDownload(),
-                      _buildThCount(),
-                      _buildSavePath(),
-                      _buildAriaConneted(),
-                    ],
-                  ),
-                  _buildSaveCanelButton(),
+                  _buildPowerBootSwitch(),
+                  _buildMaxDownload(),
+                  _buildThCount(),
+                  _buildSavePath(),
+                  _buildAriaConneted(),
                 ],
               ),
-            ),
-          ],
-        );
-      },
+              _buildSaveCanelButton(),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -69,6 +64,7 @@ class _SettingMainState extends State<SettingMain> {
       children: [
         _buildSec("开机自启"),
         Switch(
+          inactiveTrackColor: ColorTheme.switchColor.value,
           value: pb,
           onChanged: (v) {
             setState(() {
@@ -89,6 +85,7 @@ class _SettingMainState extends State<SettingMain> {
             controller: _mDCtrler,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(border: InputBorder.none),
+            style: TextStyle(color: ColorTheme.textColor.value),
           ),
         ),
       ],
@@ -104,6 +101,7 @@ class _SettingMainState extends State<SettingMain> {
             controller: _thCtrler,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(border: InputBorder.none),
+            style: TextStyle(color: ColorTheme.textColor.value),
           ),
         ),
       ],
@@ -114,7 +112,9 @@ class _SettingMainState extends State<SettingMain> {
     return Row(
       children: [
         _buildSec("保存路径"),
-        Expanded(child: buildSavePathBtn(_selectDirectory, Text(_tmpPath))),
+        Expanded(
+          child: buildSavePathBtn(_selectDirectory, buildText(_tmpPath)),
+        ),
       ],
     );
   }
@@ -123,7 +123,7 @@ class _SettingMainState extends State<SettingMain> {
     return Row(
       children: [
         _buildSec("aria2连接状态"),
-        Text(config.aria2Connected ? "已连接" : "未连接"),
+        buildText(config.aria2Connected ? "已连接" : "未连接"),
       ],
     );
   }
@@ -137,9 +137,12 @@ class _SettingMainState extends State<SettingMain> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorTheme.buttonColor.value,
+              ),
               onPressed: () {
                 config.threadCount = int.parse(_thCtrler.text);
-                config.maxDown = int.parse(_mDCtrler.text);
+                config.maxDown.value = int.parse(_mDCtrler.text);
                 setState(() {
                   _thCtrler.text = config.threadCount.toString();
                   _mDCtrler.text = config.maxDown.toString();
@@ -156,6 +159,9 @@ class _SettingMainState extends State<SettingMain> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ColorTheme.buttonColor.value,
+              ),
               onPressed: () {
                 setState(() {
                   _thCtrler.text = config.threadCount.toString();

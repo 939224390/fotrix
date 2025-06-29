@@ -26,7 +26,7 @@ class Aria2Client {
       await _startAria2();
     }
     await runLog.log("Aria2服务已启动");
-
+    await getAria2Version();
     await taskList.start();
   }
 
@@ -70,9 +70,10 @@ class Aria2Client {
     }
   }
 
-  Future<String> getAria2Version() async {
+  Future<void> getAria2Version() async {
     final v = await _sendRequest('aria2.getVersion');
-    return v["version"];
+    final version = v['version'];
+    config.aria2Version = version;
   }
 
   //检查连接状态

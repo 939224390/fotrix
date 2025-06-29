@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fotrix/models/aria2_client.dart';
 import 'package:fotrix/models/config.dart';
 import 'package:fotrix/models/logger.dart';
-import 'package:fotrix/models/page_info.dart';
-import 'package:fotrix/models/task_list.dart';
 import 'package:fotrix/models/tray_service.dart';
-import 'package:fotrix/pages/home_page.dart';
-import 'package:provider/provider.dart';
+import 'package:fotrix/home_page.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -28,16 +25,7 @@ void main() async {
   await config.loadConfig();
   await aria2Client.start();
 
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: config),
-        ChangeNotifierProvider.value(value: pageInfo),
-        ChangeNotifierProvider.value(value: taskList),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -72,21 +60,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<Config>(
-      builder: (context, conf, child) {
-        return MaterialApp(
-          theme: ThemeData(
-            fontFamily: 'HarmonyOS Sans',
-            textTheme: TextTheme(
-              bodyMedium: TextStyle(fontWeight: FontWeight.normal),
-              titleMedium: TextStyle(fontWeight: FontWeight.w500),
-            ),
-            brightness: conf.darkMode ? Brightness.dark : Brightness.light,
-          ),
-          debugShowCheckedModeBanner: false,
-          home: const HomePage(),
-        );
-      },
+    return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'HarmonyOS Sans',
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(fontWeight: FontWeight.normal),
+          titleMedium: TextStyle(fontWeight: FontWeight.w500),
+        ),
+        brightness: config.darkMode ? Brightness.dark : Brightness.light,
+      ),
+
+      debugShowCheckedModeBanner: false,
+      home: const HomePage(),
     );
   }
 }

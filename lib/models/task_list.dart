@@ -2,21 +2,20 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:fotrix/models/aria2_client.dart';
 import 'package:fotrix/models/config.dart';
-import 'package:fotrix/models/logger.dart';
+import 'package:signals/signals.dart';
 import 'task.dart';
-import 'package:flutter/material.dart';
 
-class TaskList with ChangeNotifier {
+class TaskList {
   //任务队列
-  final List<Task> _active = [];
-  final List<Task> _paused = [];
-  final List<Task> _complete = [];
-  final List<Task> _waiting = [];
+  final Signal<List<Task>> _active = Signal([]);
+  final Signal<List<Task>> _paused = Signal([]);
+  final Signal<List<Task>> _complete = Signal([]);
+  final Signal<List<Task>> _waiting = Signal([]);
 
-  List<Task> get active => _active;
-  List<Task> get paused => _paused;
-  List<Task> get complete => _complete;
-  List<Task> get waiting => _waiting;
+  List<Task> get active => _active.value;
+  List<Task> get paused => _paused.value;
+  List<Task> get complete => _complete.value;
+  List<Task> get waiting => _waiting.value;
 
   final a2c = aria2Client;
 
@@ -25,7 +24,6 @@ class TaskList with ChangeNotifier {
 
     await checkActive();
     await checkWaiting();
-    refesh();
     await Future.delayed(Duration(seconds: 2));
     start();
   }
@@ -33,7 +31,7 @@ class TaskList with ChangeNotifier {
   //创建任务
   Future<bool> createTask(String url) async {
     final list = [...active, ...paused, ...complete, ...waiting];
-    if (list.any((element) => element.url == url)) {
+    if (list.any((element) => element.url.value == url)) {
       return false;
     }
 
@@ -41,11 +39,9 @@ class TaskList with ChangeNotifier {
     final gid = await a2c.addTask(url);
     final task = await _initialTask(url, gid, TaskStatus.waiting);
 
-    _waiting.add(task);
+    waiting.add(task);
 
     await checkWaiting();
-
-    refesh();
 
     return true;
   }
@@ -54,20 +50,21 @@ class TaskList with ChangeNotifier {
   checkActive() async {
     final dlList = await a2c.tellActive();
     if (dlList.isNotEmpty) {
+      final tActive = List<Task>.from(active);
       for (var dl in dlList) {
         final gid = dl['gid'];
-        if (!active.any((element) => element.gid == gid)) {
+        if (!active.any((element) => element.gid.value == gid)) {
           final task = await _initialTask(
             dl['files'][0]['uris'][0]['uri'],
             gid,
             TaskStatus.active,
           );
-          active.add(task);
+          tActive.add(task);
           checkTaskStatus(task);
         }
       }
+      _active.value = tActive;
     }
-
   }
 
   //更新等待列表
@@ -95,25 +92,23 @@ class TaskList with ChangeNotifier {
         waiting.remove(task);
       }
     }
-    // refesh();
   }
 
   //监听任务状态
   void checkTaskStatus(Task task) async {
-    if (task.status == TaskStatus.active) {
-      final status = await a2c.tellStatus(task.gid);
-      task.completedLength = int.parse(status['completedLength'] ?? 0);
-      task.totalLength = int.parse(status['totalLength'] ?? 0);
-      task.downloadSpeed = double.parse(status['downloadSpeed'] ?? 0);
-      refesh();
-      if (task.completedLength == task.totalLength) {
+    if (task.status.value == TaskStatus.active) {
+      final status = await a2c.tellStatus(task.gid.value);
+
+      task.completedLength.value = int.parse(status['completedLength'] ?? 0);
+      task.totalLength.value = int.parse(status['totalLength'] ?? 0);
+      task.downloadSpeed.value = double.parse(status['downloadSpeed'] ?? 0);
+      if (task.completedLength.value == task.totalLength.value) {
         completeTask(task);
-        refesh();
         return;
       }
-      await Future.delayed(Duration(seconds: 1));
-      checkTaskStatus(task);
     }
+    await Future.delayed(Duration(seconds: 1));
+    checkTaskStatus(task);
   }
 
   List<int> getTaskNum() {
@@ -130,9 +125,7 @@ class TaskList with ChangeNotifier {
   void stopTask(Task task) async {
     setTaskStatus(task, TaskStatus.paused);
 
-    await a2c.pauseTask(task.gid);
-
-    refesh();
+    await a2c.pauseTask(task.gid.value);
   }
 
   //暂停所有任务
@@ -141,17 +134,13 @@ class TaskList with ChangeNotifier {
     for (var task in active) {
       setTaskStatus(task, TaskStatus.paused);
     }
-
-    refesh();
   }
 
   //继续任务
   void resumeTask(Task task) async {
     setTaskStatus(task, TaskStatus.waiting);
 
-    await a2c.resumeTask(task.gid);
-
-    refesh();
+    await a2c.resumeTask(task.gid.value);
   }
 
   //继续所有任务
@@ -162,63 +151,55 @@ class TaskList with ChangeNotifier {
     for (var task in copyPaused) {
       setTaskStatus(task, TaskStatus.waiting);
     }
-
-    refesh();
   }
 
   //任务完成
   void completeTask(Task task) {
     setTaskStatus(task, TaskStatus.complete);
-
-    refesh();
   }
 
   //删除任务
   void deleteTask(Task task) async {
-    if (task.status != TaskStatus.complete) {
-      await a2c.removeTask(task.gid);
+    if (task.status.value != TaskStatus.complete) {
+      await a2c.removeTask(task.gid.value);
     }
     setTaskStatus(task, TaskStatus.remove);
 
     if (await File(task.tmpPath).exists()) File(task.tmpPath).delete();
-    if (await File(task.savePath).exists()) File(task.savePath).delete();
-
-    refesh();
-  }
-
-  void refesh() {
-    notifyListeners();
+    if (await File(task.savePath.value).exists()) {
+      File(task.savePath.value).delete();
+    }
   }
 
   void setTaskStatus(Task task, TaskStatus taskStatus) {
     switch (taskStatus) {
       case TaskStatus.waiting:
-        task.status = TaskStatus.waiting;
+        task.status.value = TaskStatus.waiting;
         active.remove(task);
         paused.remove(task);
         // waiting.add(task);
         break;
       case TaskStatus.active:
-        task.status = TaskStatus.active;
+        task.status.value = TaskStatus.active;
         paused.remove(task);
         waiting.remove(task);
         // active.add(task);
         break;
       case TaskStatus.paused:
-        task.status = TaskStatus.paused;
+        task.status.value = TaskStatus.paused;
         active.remove(task);
         waiting.remove(task);
         paused.add(task);
         break;
       case TaskStatus.complete:
-        task.status = TaskStatus.complete;
+        task.status.value = TaskStatus.complete;
         active.remove(task);
         paused.remove(task);
         waiting.remove(task);
         complete.add(task);
         break;
       case TaskStatus.remove:
-        task.status = TaskStatus.remove;
+        task.status.value = TaskStatus.remove;
         active.remove(task);
         paused.remove(task);
         waiting.remove(task);
@@ -241,14 +222,14 @@ class TaskList with ChangeNotifier {
     final downloadSpeed = double.parse(status['downloadSpeed'] ?? 0);
 
     final task = Task(
-      gid: gid,
-      url: url,
-      name: fileName,
-      savePath: savePath,
-      completedLength: completedLength,
-      totalLength: totalLength,
-      downloadSpeed: downloadSpeed,
-      status: taskStatus,
+      gid: Signal(gid),
+      url: signal(url),
+      name: signal(fileName),
+      savePath: Signal(savePath),
+      completedLength: Signal(completedLength),
+      totalLength: Signal(totalLength),
+      downloadSpeed: Signal(downloadSpeed),
+      status: Signal(taskStatus),
     );
     return task;
   }

@@ -1,47 +1,53 @@
 import 'dart:io';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:fotrix/models/logger.dart';
+import 'package:fotrix/models/page_info.dart';
 import 'package:fotrix/utils/cross.dart';
 import 'dart:convert';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:signals/signals.dart';
 
-class Config with ChangeNotifier {
-  bool _darkMode = true;
-  int _threadCount = 6;
-  String savePath = "D:\\Download";
-  bool _powerBoot = false;
-  int maxDown = 5;
-  late String _aria2Version = "";
-  late bool _aria2Connected = false;
+class Config {
+  final _darkMode = signal(true);
+  final _threadCount = signal(6);
+  final _savePath = signal("D:\\Download");
+  final _powerBoot = signal(false);
+  final maxDown = signal(5);
+  late final _aria2Version = signal("");
+  late final _aria2Connected = signal(false);
+  String version = "0.1.1";
 
-  bool get darkMode => _darkMode;
-  int get threadCount => _threadCount;
-  bool get powerBoot => _powerBoot;
-  String get aria2Version => _aria2Version;
-  bool get aria2Connected => _aria2Connected;
+  bool get darkMode => _darkMode.value;
+  int get threadCount => _threadCount.value;
+  bool get powerBoot => _powerBoot.value;
+  String get aria2Version => _aria2Version.value;
+  bool get aria2Connected => _aria2Connected.value;
+  String get savePath => _savePath.value;
 
   set threadCount(int count) {
-    _threadCount = (count < 64 && count >= 0) ? count : 1;
+    _threadCount.value = (count < 64 && count >= 0) ? count : 1;
   }
 
   set powerBoot(bool value) {
-    _powerBoot = value;
-    if (_powerBoot == true) {
+    _powerBoot.value = value;
+    if (_powerBoot.value == true) {
       launchAtStartup.enable();
     } else {
       launchAtStartup.disable();
     }
   }
 
+  set savePath(String value) {
+    _savePath.value = value;
+  }
+
   set aria2Version(String value) {
-    _aria2Version = value;
-    notifyListeners();
+    _aria2Version.value = value;
   }
 
   set aria2Connected(bool value) {
-    _aria2Connected = value;
-    notifyListeners();
+    _aria2Connected.value = value;
   }
 
   // dark light
@@ -52,6 +58,8 @@ class Config with ChangeNotifier {
       'main': 0xFF343434,
       'text': 0xFFFFFFFF,
       'card': 0xFF2D2D2D,
+      'btn': 0xFF606060,
+      'switch': 0xFF343434,
       'button': {'default': 0xFF2D2D2D, 'active': 0xFF444444},
     },
     'light': {
@@ -60,14 +68,44 @@ class Config with ChangeNotifier {
       'main': 0xFFF8F8F8,
       'text': 0xFF000000,
       'card': 0xFFFFFFFF,
+      'btn': 0xFFFFFFFF,
+      'switch': 0xFFF8F8F8,
       'button': {'default': 0xFFF4F5F7, 'active': 0xFFCCCCCC},
     },
   };
 
   //切换模式
-  void toggleTheme() {
-    _darkMode = !_darkMode;
-    notifyListeners();
+  void changeTheme() {
+    _darkMode.value = !_darkMode.value;
+  }
+
+  late final darkModeIcon = computed(
+    () => darkMode ? Icons.dark_mode : Icons.light_mode,
+  );
+
+  //获取颜色
+  Computed<Color> getColor(String key) {
+    return computed(() {
+      final theme = _darkMode.value ? 'dark' : 'light';
+      final color = _themes[theme]![key];
+      if (color is Map) {
+        return Color(color['default']);
+      }
+      return Color(color as int);
+    });
+  }
+
+  //获取按钮颜色
+  Computed<Color> activeColor(int index) {
+    return computed(() {
+      final theme = darkMode ? 'dark' : 'light';
+      final buttonColors = _themes[theme]!['button'] as Map<String, dynamic>;
+      return Color(
+        pageInfo.mInd.value == index
+            ? buttonColors['active'] as int
+            : buttonColors['default'] as int,
+      );
+    });
   }
 
   //读取配置文件
@@ -84,14 +122,12 @@ class Config with ChangeNotifier {
       final jsonString = await File(configPath).readAsString();
       final config = jsonDecode(jsonString);
       savePath = config['savePath'] ?? savePath;
-      threadCount = config['threadCount'] ?? _threadCount;
-      _darkMode = config['darkMode'] ?? _darkMode;
-      powerBoot = config['powerBoot'] ?? _powerBoot;
-      maxDown = config['maxDown'] ?? maxDown;
+      threadCount = config['threadCount'] ?? threadCount;
+      _darkMode.value = config['darkMode'] ?? darkMode;
+      powerBoot = config['powerBoot'] ?? powerBoot;
+      maxDown.value = config['maxDown'] ?? maxDown.value;
 
       await runLog.log("加载配置文件");
-
-      notifyListeners();
     } catch (e) {
       await runLog.log("加载配置文件失败 $e");
     }
@@ -111,34 +147,21 @@ class Config with ChangeNotifier {
           'maxDown': maxDown,
         }),
       );
-
-      notifyListeners();
     } catch (e) {
       await runLog.log("保存配置文件失败 $e");
     }
   }
-
-  //获取颜色
-  Color getColor(String key) {
-    final theme = darkMode ? 'dark' : 'light';
-    final color = _themes[theme]![key];
-    if (color is Map) {
-      return Color(color['default']);
-    }
-    return Color(color as int);
-  }
-
-  //获取按钮颜色
-  Color currActiveColor(int activeIndex, int index) {
-    final theme = darkMode ? 'dark' : 'light';
-    final buttonColors = _themes[theme]!['button'] as Map<String, dynamic>;
-
-    return Color(
-      activeIndex == index
-          ? buttonColors['active'] as int
-          : buttonColors['default'] as int,
-    );
-  }
 }
 
 Config config = Config();
+
+class ColorTheme {
+  static final navColor = config.getColor("nav");
+  static final sideColor = config.getColor("side");
+  static final mainColor = config.getColor("main");
+  static final textColor = config.getColor("text");
+  static final cardColor = config.getColor("card");
+  static final buttonColor = config.getColor("button");
+  static final btnColor = config.getColor("btn");
+  static final switchColor = config.getColor("switch");
+}
