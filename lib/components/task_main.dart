@@ -22,33 +22,21 @@ class TaskMain extends StatelessWidget {
         data.sideItem[pageInfo.pInd.value].subItems[pageInfo.mInd.value].title,
   );
 
-  late final list = computed(
-    () => [
-      taskList.active,
-      taskList.waiting,
-      taskList.paused,
-      taskList.complete,
-    ],
+  late final currList = computed(
+    () => switch (pageInfo.mInd.value) {
+      0 => taskList.active,
+      1 => taskList.waiting,
+      2 => taskList.paused,
+      3 => taskList.complete,
+      _ => [],
+    },
   );
 
   @override
   Widget build(BuildContext context) {
     return _buildMain([
       buildMainTitle(title.watch(context)),
-      Row(
-        children: [
-          IconButton(
-            onPressed: () => resume,
-            icon: Icon(Icons.play_arrow),
-            color: ColorTheme.textColor.value,
-          ),
-          IconButton(
-            onPressed: () => stop,
-            icon: Icon(Icons.pause),
-            color: ColorTheme.textColor.value,
-          ),
-        ],
-      ),
+      _buildBtn(),
     ], _buildList());
   }
 
@@ -68,13 +56,30 @@ class TaskMain extends StatelessWidget {
     );
   }
 
+  Widget _buildBtn() {
+    return Row(
+      children: [
+        IconButton(
+          onPressed: () => resume(),
+          icon: Icon(Icons.play_arrow),
+          color: ColorTheme.textColor.value,
+        ),
+        IconButton(
+          onPressed: () => stop(),
+          icon: Icon(Icons.pause),
+          color: ColorTheme.textColor.value,
+        ),
+      ],
+    );
+  }
+
   Widget _buildList() {
     return Watch(
       (_) => ListView.builder(
         shrinkWrap: true,
-        itemCount: list.value[pageInfo.mInd.value].length,
+        itemCount: currList.value.length,
         itemBuilder: (context, index) {
-          return TaskItem(task: list.value[pageInfo.mInd.value][index]);
+          return TaskItem(task: currList.value[index]);
         },
       ),
     );

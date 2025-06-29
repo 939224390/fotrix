@@ -35,7 +35,7 @@ class TaskItem extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                buildText(task.name.value),
+                buildText(task.name),
                 buildText(task.progress.watch(context)),
               ],
             ),
@@ -67,7 +67,9 @@ class TaskItem extends StatelessWidget {
     } else {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [buildText(' ${(task.dlSize)}/${task.totalSize}')],
+        children: [
+          buildText(' ${(task.dlSize.value)}/${task.totalSize.value}'),
+        ],
       );
     }
   }

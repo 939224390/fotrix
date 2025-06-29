@@ -3,11 +3,11 @@ import 'package:signals/signals.dart';
 enum TaskStatus { active, paused, complete, waiting, remove }
 
 class Task {
-  final Signal<String> gid;
-  final Signal<String> name;
-  final Signal<String> savePath;
+  final String gid;
+  final String url;
+  final String name;
+  final String savePath;
   final Signal<int> completedLength;
-  final Signal<String> url;
   final Signal<int> totalLength;
   final Signal<double> downloadSpeed;
   final Signal<TaskStatus> status;
@@ -74,10 +74,6 @@ class Task {
     }
   });
 
-  //   String get dlSize => _formatSize(completedLength.value);
-  //   String get totalSize => _formatSize(totalLength.value);
-  //   String get formattedSpeed => _calculateSpeed(this);
-  //   String get remainTime => _calculateRemainingTime(this);
 
   Task({
     required this.gid,

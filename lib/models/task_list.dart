@@ -31,7 +31,7 @@ class TaskList {
   //创建任务
   Future<bool> createTask(String url) async {
     final list = [...active, ...paused, ...complete, ...waiting];
-    if (list.any((element) => element.url.value == url)) {
+    if (list.any((element) => element.url == url)) {
       return false;
     }
 
@@ -53,7 +53,7 @@ class TaskList {
       final tActive = List<Task>.from(active);
       for (var dl in dlList) {
         final gid = dl['gid'];
-        if (!active.any((element) => element.gid.value == gid)) {
+        if (!active.any((element) => element.gid == gid)) {
           final task = await _initialTask(
             dl['files'][0]['uris'][0]['uri'],
             gid,
@@ -97,7 +97,7 @@ class TaskList {
   //监听任务状态
   void checkTaskStatus(Task task) async {
     if (task.status.value == TaskStatus.active) {
-      final status = await a2c.tellStatus(task.gid.value);
+      final status = await a2c.tellStatus(task.gid);
 
       task.completedLength.value = int.parse(status['completedLength'] ?? 0);
       task.totalLength.value = int.parse(status['totalLength'] ?? 0);
@@ -125,7 +125,7 @@ class TaskList {
   void stopTask(Task task) async {
     setTaskStatus(task, TaskStatus.paused);
 
-    await a2c.pauseTask(task.gid.value);
+    await a2c.pauseTask(task.gid);
   }
 
   //暂停所有任务
@@ -140,7 +140,7 @@ class TaskList {
   void resumeTask(Task task) async {
     setTaskStatus(task, TaskStatus.waiting);
 
-    await a2c.resumeTask(task.gid.value);
+    await a2c.resumeTask(task.gid);
   }
 
   //继续所有任务
@@ -161,13 +161,13 @@ class TaskList {
   //删除任务
   void deleteTask(Task task) async {
     if (task.status.value != TaskStatus.complete) {
-      await a2c.removeTask(task.gid.value);
+      await a2c.removeTask(task.gid);
     }
     setTaskStatus(task, TaskStatus.remove);
 
     if (await File(task.tmpPath).exists()) File(task.tmpPath).delete();
-    if (await File(task.savePath.value).exists()) {
-      File(task.savePath.value).delete();
+    if (await File(task.savePath).exists()) {
+      File(task.savePath).delete();
     }
   }
 
@@ -175,37 +175,43 @@ class TaskList {
     switch (taskStatus) {
       case TaskStatus.waiting:
         task.status.value = TaskStatus.waiting;
-        active.remove(task);
-        paused.remove(task);
-        // waiting.add(task);
+        _active.value = remove(active, task);
+        _paused.value = remove(paused, task);
         break;
       case TaskStatus.active:
         task.status.value = TaskStatus.active;
-        paused.remove(task);
-        waiting.remove(task);
-        // active.add(task);
+        _paused.value = remove(paused, task);
+        _waiting.value = remove(waiting, task);
         break;
       case TaskStatus.paused:
         task.status.value = TaskStatus.paused;
-        active.remove(task);
-        waiting.remove(task);
-        paused.add(task);
+        _active.value = remove(active, task);
+        _waiting.value = remove(waiting, task);
+        _paused.value = add(paused, task);
         break;
       case TaskStatus.complete:
         task.status.value = TaskStatus.complete;
-        active.remove(task);
-        paused.remove(task);
-        waiting.remove(task);
-        complete.add(task);
+        _active.value = remove(active, task);
+        _paused.value = remove(paused, task);
+        _waiting.value = remove(waiting, task);
+        _complete.value = add(complete, task);
         break;
       case TaskStatus.remove:
         task.status.value = TaskStatus.remove;
-        active.remove(task);
-        paused.remove(task);
-        waiting.remove(task);
-        complete.remove(task);
+        _active.value = remove(active, task);
+        _paused.value = remove(paused, task);
+        _waiting.value = remove(waiting, task);
+        _complete.value = remove(complete, task);
         break;
     }
+  }
+
+  List<Task> remove(List<Task> list, Task task) {
+    return list.where((t) => t != task).toList();
+  }
+
+  List<Task> add(List<Task> list, Task task) {
+    return list = [...list, task];
   }
 
   //初始化任务
@@ -222,10 +228,10 @@ class TaskList {
     final downloadSpeed = double.parse(status['downloadSpeed'] ?? 0);
 
     final task = Task(
-      gid: Signal(gid),
-      url: signal(url),
-      name: signal(fileName),
-      savePath: Signal(savePath),
+      gid: gid,
+      url: url,
+      name: fileName,
+      savePath: savePath,
       completedLength: Signal(completedLength),
       totalLength: Signal(totalLength),
       downloadSpeed: Signal(downloadSpeed),

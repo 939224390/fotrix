@@ -79,7 +79,8 @@ class Aria2Client {
   //检查连接状态
   Future<bool> checkConnection() async {
     try {
-      if (await _sendRequest('aria2.getVersion') != -1) {
+      final ok = await _sendRequest('aria2.getVersion');
+      if (ok != -1) {
         return true;
       }
       return false;
