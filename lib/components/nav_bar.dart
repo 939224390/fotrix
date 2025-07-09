@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/models/page_info.dart';
+import 'package:fotrix/store/page_info.dart';
 
 class NavBar extends StatelessWidget {
   const NavBar({super.key, required this.data, required this.onTap});

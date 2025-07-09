@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/models/config.dart';
-import 'package:fotrix/models/page_info.dart';
+import 'package:fotrix/store/config.dart';
+import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:signals/signals_flutter.dart';
 

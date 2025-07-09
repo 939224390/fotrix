@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/models/config.dart';
+import 'package:fotrix/store/config.dart';
 import 'package:signals/signals_flutter.dart';
 
 class PageInfo {

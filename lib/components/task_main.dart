@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/models/config.dart';
+import 'package:fotrix/store/config.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/components/task_item.dart';
-import 'package:fotrix/models/page_info.dart';
-import 'package:fotrix/models/task_list.dart';
+import 'package:fotrix/store/page_info.dart';
+import 'package:fotrix/store/task_list.dart';
 import 'package:signals/signals_flutter.dart';
 
 class TaskMain extends StatelessWidget {

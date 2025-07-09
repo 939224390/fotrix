@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/components/add_task.dart';
-import 'package:fotrix/models/config.dart';
-import 'package:fotrix/models/page_info.dart';
-import 'package:fotrix/models/task_list.dart';
+import 'package:fotrix/store/config.dart';
+import 'package:fotrix/store/page_info.dart';
+import 'package:fotrix/store/task_list.dart';
 
 class FotrixLogic {
   PageInfo state = PageInfo();

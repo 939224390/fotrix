@@ -43,6 +43,10 @@ dependencies:
     process_run: ^1.2.4
     signals: ^6.0.2
     package_info_plus: ^8.3.0
+    stream_channel: ^2.1.4
+    web_socket_channel: ^3.0.3
+    json_rpc_2: ^4.0.0
+    dio: ^5.8.0+1
 
 dev_dependencies:
     flutter_test:

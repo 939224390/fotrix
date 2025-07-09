@@ -1,7 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:fotrix/models/aria2_client.dart';
-import 'package:fotrix/models/config.dart';
+import 'package:fotrix/store/aria2_client.dart';
+import 'package:fotrix/store/config.dart';
 import 'package:signals/signals.dart';
 import 'task.dart';
 
@@ -18,14 +19,14 @@ class TaskList {
   List<Task> get waiting => _waiting.value;
 
   final a2c = aria2Client;
-
   start() async {
-    config.aria2Connected = await a2c.checkConnection();
-
-    await checkActive();
-    await checkWaiting();
-    await Future.delayed(Duration(seconds: 2));
-    start();
+    Timer.periodic(Duration(seconds: 1), (Timer timer) async {
+      await checkActive();
+      await checkWaiting();
+    });
+    Timer.periodic(Duration(seconds: 5), (Timer timer) async {
+      config.aria2Connected = await a2c.isConnecting();
+    });
   }
 
   //创建任务
@@ -96,19 +97,23 @@ class TaskList {
 
   //监听任务状态
   void checkTaskStatus(Task task) async {
-    if (task.status.value == TaskStatus.active) {
-      final status = await a2c.tellStatus(task.gid);
+    bool isFinish = false;
+    final cnt = Timer.periodic(Duration(seconds: 1), (Timer time) async {
+      if (task.status.value == TaskStatus.active) {
+        final status = await a2c.tellStatus(task.gid);
 
-      task.completedLength.value = int.parse(status['completedLength'] ?? 0);
-      task.totalLength.value = int.parse(status['totalLength'] ?? 0);
-      task.downloadSpeed.value = double.parse(status['downloadSpeed'] ?? 0);
-      if (task.completedLength.value == task.totalLength.value) {
-        completeTask(task);
-        return;
+        task.completedLength.value = int.parse(status['completedLength'] ?? 0);
+        task.totalLength.value = int.parse(status['totalLength'] ?? 0);
+        task.downloadSpeed.value = double.parse(status['downloadSpeed'] ?? 0);
+        if (task.completedLength.value == task.totalLength.value) {
+          completeTask(task);
+          isFinish = true;
+        }
       }
+    });
+    if (isFinish) {
+      cnt.cancel();
     }
-    await Future.delayed(Duration(seconds: 1));
-    checkTaskStatus(task);
   }
 
   List<int> getTaskNum() {
@@ -164,6 +169,8 @@ class TaskList {
       await a2c.removeTask(task.gid);
     }
     setTaskStatus(task, TaskStatus.remove);
+
+    await Future.delayed(Duration(seconds: 1));
 
     if (await File(task.tmpPath).exists()) File(task.tmpPath).delete();
     if (await File(task.savePath).exists()) {

@@ -1,7 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fotrix/utils/common.dart';
-import 'package:fotrix/models/config.dart';
+import 'package:fotrix/store/config.dart';
 
 class SettingMain extends StatefulWidget {
   const SettingMain({super.key});

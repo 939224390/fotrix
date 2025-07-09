@@ -6,9 +6,9 @@ import 'package:fotrix/components/setting_main.dart';
 import 'package:fotrix/components/task_main.dart';
 import 'package:fotrix/components/window_control.dart';
 import 'package:fotrix/utils/logic.dart';
-import 'package:fotrix/models/page_info.dart';
-import 'package:fotrix/models/tray_service.dart';
-import 'package:fotrix/models/config.dart';
+import 'package:fotrix/store/page_info.dart';
+import 'package:fotrix/store/tray_service.dart';
+import 'package:fotrix/store/config.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:tray_manager/tray_manager.dart';
 

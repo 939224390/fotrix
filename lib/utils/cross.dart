@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:fotrix/models/config.dart';
+import 'package:fotrix/store/config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:process_run/shell.dart';
 
-import '../models/logger.dart';
+import '../store/logger.dart';
 
 class Cross {
   //获取配置路径
@@ -15,11 +15,11 @@ class Cross {
 
   //创建日志文件
   Future<String> createLog() async {
-    final file = File('${await getDocPath()}/log.txt');
+    final file = File('${await getDocPath()}/fotrix.log');
     if (!await file.exists()) {
       await file.create();
     }
-    return '${await getDocPath()}/log.txt';
+    return '${await getDocPath()}/fotrix.log';
   }
 
   //创建配置文件件
@@ -63,12 +63,16 @@ class Cross {
     }
   }
 
+  Future<String> getAria2LogPath() async {
+    return '${await getDocPath()}/aria2/aria2.log';
+  }
+
   //获取aria2路径
   Future<String> getAria2Path() async {
     if (Platform.isWindows) {
-      return '${await getDocPath()}/aria2/aria2c.exe';
+      return '${await getDocPath()}/aria2/fotrixaria2c.exe';
     }
-    return '${await getDocPath()}/aria2/ariac';
+    return '${await getDocPath()}/aria2/fotrixariac';
   }
 
   //获取aria2配置文件

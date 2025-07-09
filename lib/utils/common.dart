@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/models/config.dart';
+import 'package:fotrix/store/config.dart';
 
 //默认字体
 Widget buildText(String text) {

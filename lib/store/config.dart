@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:fotrix/models/logger.dart';
-import 'package:fotrix/models/page_info.dart';
+import 'package:fotrix/store/logger.dart';
+import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/utils/cross.dart';
 import 'dart:convert';
 import 'package:launch_at_startup/launch_at_startup.dart';
