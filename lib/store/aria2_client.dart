@@ -23,6 +23,7 @@ class Aria2Server {
         return;
       }
     }
+
     await _startAria2();
   }
 

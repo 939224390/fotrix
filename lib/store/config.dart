@@ -10,23 +10,23 @@ import 'package:signals/signals.dart';
 
 class Config {
   final _darkMode = signal(true);
-  final _threadCount = signal(6);
+  int _threadCount = 6;
   final _savePath = signal("D:\\Download");
   final _powerBoot = signal(false);
-  final maxDown = signal(5);
+  int maxDown = 5;
   late final _aria2Version = signal("");
   late final _aria2Connected = signal(false);
-  String version = "0.1.1";
+  String version = "0.1.2";
 
   bool get darkMode => _darkMode.value;
-  int get threadCount => _threadCount.value;
+  int get threadCount => _threadCount;
   bool get powerBoot => _powerBoot.value;
   String get aria2Version => _aria2Version.value;
   bool get aria2Connected => _aria2Connected.value;
   String get savePath => _savePath.value;
 
   set threadCount(int count) {
-    _threadCount.value = (count < 64 && count >= 0) ? count : 1;
+    _threadCount = (count < 64 && count >= 0) ? count : 1;
   }
 
   set powerBoot(bool value) {
@@ -101,7 +101,7 @@ class Config {
       final theme = darkMode ? 'dark' : 'light';
       final buttonColors = _themes[theme]!['button'] as Map<String, dynamic>;
       return Color(
-        pageInfo.mInd.value == index
+        pInf.mInd == index
             ? buttonColors['active'] as int
             : buttonColors['default'] as int,
       );
@@ -125,7 +125,7 @@ class Config {
       threadCount = config['threadCount'] ?? threadCount;
       _darkMode.value = config['darkMode'] ?? darkMode;
       powerBoot = config['powerBoot'] ?? powerBoot;
-      maxDown.value = config['maxDown'] ?? maxDown.value;
+      maxDown = config['maxDown'] ?? maxDown;
 
       await runLog.log("加载配置文件");
     } catch (e) {

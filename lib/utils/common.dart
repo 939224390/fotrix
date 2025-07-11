@@ -14,16 +14,7 @@ Widget buildLText(String text) {
   );
 }
 
-Widget buildXLText(String text) {
-  return Text(
-    text,
-    style: TextStyle(
-      color: ColorTheme.textColor.value,
-      fontSize: 30,
-      fontWeight: FontWeight.bold,
-    ),
-  );
-}
+
 
 //默认图标
 Widget buildIcon(IconData icon) {
@@ -41,15 +32,6 @@ Widget buildDivider() {
 ///内容标题
 Widget buildMainTitle(String text) {
   return Padding(padding: const EdgeInsets.all(12.0), child: buildText(text));
-}
-
-///添加任务对话框
-Widget buildAddTaskDialog(List<Widget> children) {
-  return SimpleDialog(
-    backgroundColor: ColorTheme.cardColor.value,
-    title: buildText("新建下载任务"),
-    children: children,
-  );
 }
 
 Widget buildTaskCard(Widget child) {

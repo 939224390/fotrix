@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/store/config.dart';
 
-class SettingMain extends StatefulWidget {
-  const SettingMain({super.key});
+class MainSetting extends StatefulWidget {
+  const MainSetting({super.key});
 
   @override
-  State<SettingMain> createState() => _SettingMainState();
+  State<MainSetting> createState() => _MainSettingState();
 }
 
-class _SettingMainState extends State<SettingMain> {
+class _MainSettingState extends State<MainSetting> {
   final TextEditingController _thCtrler = TextEditingController();
   final TextEditingController _mDCtrler = TextEditingController();
   String _tmpPath = config.savePath;
@@ -34,24 +34,23 @@ class _SettingMainState extends State<SettingMain> {
       children: [
         buildMainTitle("设置"),
         buildDivider(),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  _buildPowerBootSwitch(),
-                  _buildMaxDownload(),
-                  _buildThCount(),
-                  _buildSavePath(),
-                  _buildAriaConneted(),
-                ],
-              ),
-              _buildSaveCanelButton(),
-            ],
-          ),
-        ),
+        _buildSettingList([
+          _buildPowerBootSwitch(),
+          _buildMaxDownload(),
+          _buildThCount(),
+          _buildSavePath(),
+          _buildAriaConneted(),
+        ], _buildSaveCanelButton()),
       ],
+    );
+  }
+
+  Widget _buildSettingList(List<Widget> children, Widget child) {
+    return Expanded(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [Column(children: children), child],
+      ),
     );
   }
 
@@ -142,7 +141,7 @@ class _SettingMainState extends State<SettingMain> {
               ),
               onPressed: () {
                 config.threadCount = int.parse(_thCtrler.text);
-                config.maxDown.value = int.parse(_mDCtrler.text);
+                config.maxDown = int.parse(_mDCtrler.text);
                 setState(() {
                   _thCtrler.text = config.threadCount.toString();
                   _mDCtrler.text = config.maxDown.toString();

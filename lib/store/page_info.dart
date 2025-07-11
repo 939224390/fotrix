@@ -4,17 +4,19 @@ import 'package:signals/signals_flutter.dart';
 
 class PageInfo {
   // 分类索引
-  final pInd = signal(0);
+  final _pInd = signal(0);
   // 主页面索引
-  final mInd = signal(0);
+  final _mInd = signal(0);
 
-  void changePage(int p) {
-    mInd.value = 0;
-    pInd.value = p;
+  int get pInd => _pInd.value;
+  int get mInd => _mInd.value;
+
+  set pInd(int p) {
+    _pInd.value = p;
   }
 
-  void changeMain(int m) {
-    mInd.value = m;
+  set mInd(int m) {
+    _mInd.value = m;
   }
 
   // 导航栏图标
@@ -50,26 +52,22 @@ class PageInfo {
         SideSubItemInfo(
           icon: Icons.play_arrow,
           title: "下载中",
-          subTitle: "0",
           tag: SideSubItemStatus.active,
           isSelect: true,
         ),
         SideSubItemInfo(
           icon: Icons.stop,
           title: "等待中",
-          subTitle: "0",
           tag: SideSubItemStatus.waiting,
         ),
         SideSubItemInfo(
           icon: Icons.pause,
           title: "已暂停",
-          subTitle: "0",
           tag: SideSubItemStatus.paused,
         ),
         SideSubItemInfo(
           icon: Icons.download_done,
           title: "已完成",
-          subTitle: "0",
           tag: SideSubItemStatus.complete,
         ),
       ]),
@@ -88,14 +86,9 @@ class PageInfo {
       ]),
     ];
   }
-
-  List<List<String>> sideBtn = [
-    ["下载中", "等待中", "已暂停", "已完成"],
-    ["设置", "关于"],
-  ];
 }
 
-PageInfo pageInfo = PageInfo();
+PageInfo pInf = PageInfo();
 
 class NavBarItemInfo {
   IconData icon;
@@ -120,13 +113,11 @@ class SideItemInfo {
 class SideSubItemInfo {
   IconData icon;
   String title;
-  String? subTitle;
   String tag;
   bool isSelect;
   SideSubItemInfo({
     required this.icon,
     required this.title,
-    this.subTitle,
     required this.tag,
     this.isSelect = false,
   });

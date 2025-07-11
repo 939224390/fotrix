@@ -6,24 +6,16 @@ import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/task_list.dart';
 import 'package:signals/signals_flutter.dart';
 
-class TaskMain extends StatelessWidget {
-  TaskMain({
-    super.key,
-    required this.data,
-    required this.resume,
-    required this.stop,
-  });
+class MainTask extends StatelessWidget {
+  MainTask({super.key, required this.data});
   final PageInfo data;
-  final dynamic Function() resume;
-  final dynamic Function() stop;
 
   late final title = computed(
-    () =>
-        data.sideItem[pageInfo.pInd.value].subItems[pageInfo.mInd.value].title,
+    () => data.sideItem[pInf.pInd].subItems[pInf.mInd].title,
   );
 
   late final currList = computed(
-    () => switch (pageInfo.mInd.value) {
+    () => switch (pInf.mInd) {
       0 => taskList.active,
       1 => taskList.waiting,
       2 => taskList.paused,
@@ -60,12 +52,12 @@ class TaskMain extends StatelessWidget {
     return Row(
       children: [
         IconButton(
-          onPressed: () => resume(),
+          onPressed: () => {},
           icon: Icon(Icons.play_arrow),
           color: ColorTheme.textColor.value,
         ),
         IconButton(
-          onPressed: () => stop(),
+          onPressed: () => {},
           icon: Icon(Icons.pause),
           color: ColorTheme.textColor.value,
         ),

@@ -30,32 +30,46 @@ class _AddTaskState extends State<AddTask> {
 
   @override
   Widget build(BuildContext context) {
-    return buildAddTaskDialog([
-      Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: _urlCtrler,
-              focusNode: _focusNode,
-              decoration: InputDecoration(
-                hintText: "请输入下载链接",
-                border: OutlineInputBorder(),
-              ),
-              //   onSubmitted: (_) => _createDownloadTask(), // 回车触发
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorTheme.buttonColor.value,
-              ),
-              onPressed: _createDownloadTask,
-              child: Text("开始下载"),
-            ),
-          ],
-        ),
-      ),
+    return _buildAddTaskDialog([
+      _buildInput(),
+      SizedBox(height: 16),
+      _buildStartBtn(),
     ]);
+  }
+
+  Widget _buildAddTaskDialog(List<Widget> children) {
+    return SimpleDialog(
+      backgroundColor: ColorTheme.cardColor.value,
+      title: buildText("新建下载任务"),
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(children: children),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInput() {
+    return TextField(
+      controller: _urlCtrler,
+      focusNode: _focusNode,
+      decoration: InputDecoration(
+        hintText: "请输入下载链接",
+        border: OutlineInputBorder(),
+      ),
+      //   onSubmitted: (_) => _createDownloadTask(), // 回车触发
+    );
+  }
+
+  Widget _buildStartBtn() {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: ColorTheme.buttonColor.value,
+      ),
+      onPressed: _createDownloadTask,
+      child: Text("开始下载"),
+    );
   }
 
   //创建下载任务

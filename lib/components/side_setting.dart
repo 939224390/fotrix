@@ -4,8 +4,8 @@ import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:signals/signals_flutter.dart';
 
-class PageSide extends StatelessWidget {
-  const PageSide({super.key, required this.data, required this.onTap});
+class SideSetting extends StatelessWidget {
+  const SideSetting({super.key, required this.data, required this.onTap});
 
   final PageInfo data;
   final dynamic Function(SideSubItemInfo item) onTap;
@@ -14,13 +14,15 @@ class PageSide extends StatelessWidget {
   Widget build(BuildContext context) {
     return Watch(
       (_) => _buildSide(
-        itemBuilder: (index) {
+        itemBuilder: (sideItem) {
           return [
-            _buildSideTitle(index.title),
+            //侧边标题
+            _buildSideTitle(sideItem.title),
             SizedBox(height: 30),
+            //侧边子列表
             _buildSideSubList(
-              index,
-              subItemBuilder: (subIdex,index) {
+              sideItem,
+              subItemBuilder: (subIdex, index) {
                 return _buildSideButton(subIdex, () => onTap(subIdex), index);
               },
             ),
@@ -33,7 +35,7 @@ class PageSide extends StatelessWidget {
   Widget _buildSide({
     required List<Widget> Function(SideItemInfo item) itemBuilder,
   }) {
-    return Column(children: itemBuilder(data.sideItem[pageInfo.pInd.value]));
+    return Column(children: itemBuilder(data.sideItem[1]));
   }
 
   Widget _buildSideTitle(String text) {
@@ -49,12 +51,12 @@ class PageSide extends StatelessWidget {
   }) {
     return Column(
       children: List.generate(item.subItems.length, (index) {
-        return subItemBuilder(item.subItems[index],index);
+        return subItemBuilder(item.subItems[index], index);
       }),
     );
   }
 
-  Widget _buildSideButton(SideSubItemInfo item, Function func,int index) {
+  Widget _buildSideButton(SideSubItemInfo item, Function func, int index) {
     return Watch(
       (_) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -68,13 +70,7 @@ class PageSide extends StatelessWidget {
             elevation: 0,
             side: BorderSide.none,
           ),
-          child: Row(
-            children: [
-              buildIcon(item.icon),
-              buildText(item.title),
-              item.subTitle != null ? buildText(item.subTitle!) : SizedBox(),
-            ],
-          ),
+          child: Row(children: [buildIcon(item.icon), buildText(item.title)]),
         ),
       ),
     );

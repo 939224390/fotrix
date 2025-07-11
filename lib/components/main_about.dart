@@ -3,14 +3,14 @@ import "package:fotrix/utils/common.dart";
 import "package:fotrix/store/config.dart";
 import "package:signals/signals_flutter.dart";
 
-class AboutMain extends StatefulWidget {
-  const AboutMain({super.key});
+class MainAbout extends StatefulWidget {
+  const MainAbout({super.key});
 
   @override
-  State<AboutMain> createState() => _AboutMainState();
+  State<MainAbout> createState() => _MainAboutState();
 }
 
-class _AboutMainState extends State<AboutMain> {
+class _MainAboutState extends State<MainAbout> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -20,7 +20,7 @@ class _AboutMainState extends State<AboutMain> {
           children: [
             buildMainTitle("关于"),
             buildDivider(),
-            buildXLText("fotrix"),
+            _buildXLText("fotrix"),
             buildText("Fotrix 是一个基于 Flutter 开发的aria2下载工具"),
           ],
         ),
@@ -36,6 +36,17 @@ class _AboutMainState extends State<AboutMain> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildXLText(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        color: ColorTheme.textColor.value,
+        fontSize: 30,
+        fontWeight: FontWeight.bold,
+      ),
     );
   }
 }

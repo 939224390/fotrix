@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/components/nav_bar.dart';
-import 'package:fotrix/components/page_side.dart';
-import 'package:fotrix/components/about_main.dart';
-import 'package:fotrix/components/setting_main.dart';
-import 'package:fotrix/components/task_main.dart';
+import 'package:fotrix/components/main_about.dart';
+import 'package:fotrix/components/main_setting.dart';
+import 'package:fotrix/components/side_setting.dart';
+import 'package:fotrix/components/side_task.dart';
+import 'package:fotrix/components/main_task.dart';
 import 'package:fotrix/components/window_control.dart';
-import 'package:fotrix/utils/logic.dart';
+import 'package:fotrix/page_logic.dart';
 import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/tray_service.dart';
 import 'package:fotrix/store/config.dart';
@@ -20,29 +21,27 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TrayListener {
-  final logic = FotrixLogic();
-  final data = FotrixLogic().state;
+  final logic = PageLogic();
+  final data = pInf;
   @override
   Widget build(BuildContext context) {
     logic.init(context);
     return _buildMainLayout([
       //导航栏
-      _buildNavBar(
-        NavBar(data: data, onTap: (item) => logic.navigationLogic(item)),
-      ),
+      _buildNavBar(NavBar(data: data, onTap: (item) => logic.navLogic(item))),
       //侧边栏
-      _buildSide(PageSide(data: data, onTap: (item) => logic.sideLogic(item))),
+      _buildSide([
+        SideTask(data: data, onTap: (item) => logic.sideLogic(item)),
+        SideSetting(data: data, onTap: (item) => logic.sideLogic(item)),
+      ]),
+
       //页面栏
       _buildMain([
-        TaskMain(
-          data: data,
-          resume: () => logic.resumeAllTask,
-          stop: () => logic.stopAllTask,
-        ),
+        MainTask(data: data),
         Watch(
           (_) => IndexedStack(
-            index: pageInfo.mInd.value,
-            children: [SettingMain(), AboutMain()],
+            index: pInf.mInd,
+            children: [MainSetting(), MainAbout()],
           ),
         ),
       ]),
@@ -66,12 +65,19 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   ///侧边导航
-  Widget _buildSide(Widget child) {
+  Widget _buildSide(List<Widget> children) {
     return Container(
       color: ColorTheme.sideColor.watch(context),
       width: 200,
       child: Column(
-        children: [WindowControl(mode: "move"), Expanded(child: child)],
+        children: [
+          WindowControl(mode: "move"),
+          Expanded(
+            child: Watch(
+              (_) => IndexedStack(index: pInf.pInd, children: children),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -86,10 +92,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
             WindowControl(mode: "ctrl"),
             Expanded(
               child: Watch(
-                (_) => IndexedStack(
-                  index: pageInfo.pInd.value,
-                  children: children,
-                ),
+                (_) => IndexedStack(index: pInf.pInd, children: children),
               ),
             ),
           ],

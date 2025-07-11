@@ -47,6 +47,7 @@ dependencies:
     web_socket_channel: ^3.0.3
     json_rpc_2: ^4.0.0
     dio: ^5.8.0+1
+    open_file: ^3.5.10
 
 dev_dependencies:
     flutter_test:
