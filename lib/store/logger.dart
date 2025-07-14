@@ -3,16 +3,37 @@ import 'package:process_run/stdio.dart';
 
 class Logger {
   late String _logPath = "";
+  File? logFile;
 
-  createLog() async {
+  initLog() async {
     _logPath = await Cross().createLog();
+    logFile = File(_logPath);
   }
 
-  log(String msg) async {
+  checkLog() async {
+    logFile = File(_logPath);
+    if (!await logFile!.exists()) {
+      await initLog();
+    }
+  }
+
+  info(String msg) async {
     String time = DateTime.now().toString();
-    final logFile = File(_logPath);
-    await logFile.writeAsString("[$time] $msg\n", mode: FileMode.append);
+    await checkLog();
+    await logFile?.writeAsString(
+      "[$time] [INFO] $msg\n",
+      mode: FileMode.append,
+    );
+  }
+
+  error(String msg) async {
+    String time = DateTime.now().toString();
+    await checkLog();
+    await logFile?.writeAsString(
+      "[$time] [ERROR] $msg\n",
+      mode: FileMode.append,
+    );
   }
 }
 
-Logger runLog = Logger();
+Logger logger = Logger();

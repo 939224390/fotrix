@@ -24,7 +24,7 @@ class TrayService {
           MenuItem(
             label: '退出',
             onClick: (_) async {
-              aria2Client.shutdown();
+              await aria2Client.shutdown();
               exit(0);
             },
           ),

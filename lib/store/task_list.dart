@@ -2,43 +2,43 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:fotrix/store/aria2_client.dart';
-import 'package:fotrix/store/config.dart';
 import 'package:signals/signals.dart';
 import 'task.dart';
 
 class TaskList {
   //任务队列
   final Signal<List<Task>> _active = Signal([]);
-  final Signal<List<Task>> _paused = Signal([]);
   final Signal<List<Task>> _complete = Signal([]);
   final Signal<List<Task>> _waiting = Signal([]);
 
   List<Task> get active => _active.value;
-  List<Task> get paused => _paused.value;
   List<Task> get complete => _complete.value;
   List<Task> get waiting => _waiting.value;
 
   final a2c = aria2Client;
+
   start() async {
     Timer.periodic(Duration(seconds: 1), (Timer timer) async {
-      await checkActive();
       await checkWaiting();
-    });
-    Timer.periodic(Duration(seconds: 5), (Timer timer) async {
-      config.aria2Connected = await a2c.isConnecting();
     });
   }
 
   //创建任务
   Future<bool> createTask(String url) async {
-    final list = [...active, ...paused, ...complete, ...waiting];
+    final list = [...active, ...complete, ...waiting];
     if (list.any((element) => element.url == url)) {
       return false;
     }
 
     //创建任务后加入等待队列
     final gid = await a2c.addTask(url);
-    final task = await _initialTask(url, gid, TaskStatus.waiting);
+    final status = await a2c.tellStatus(gid);
+    final task = await _initialTask(
+      url,
+      gid,
+      status['files'][0]['path'],
+      TaskStatus.waiting,
+    );
 
     waiting.add(task);
 
@@ -48,23 +48,23 @@ class TaskList {
   }
 
   //更新下载列表
-  checkActive() async {
-    final dlList = await a2c.tellActive();
-    if (dlList.isNotEmpty) {
-      final tActive = List<Task>.from(active);
-      for (var dl in dlList) {
-        final gid = dl['gid'];
-        if (!active.any((element) => element.gid == gid)) {
-          final task = await _initialTask(
-            dl['files'][0]['uris'][0]['uri'],
-            gid,
-            TaskStatus.active,
-          );
-          tActive.add(task);
-          checkTaskStatus(task);
-        }
+  checkActive(List<dynamic> list) async {
+    for (var item in list) {
+      final gid = item['gid'];
+      if (![...active, ...waiting].any((ele) => ele.gid == gid)) {
+        final taskDetail = await a2c.tellStatus(gid);
+        final task = await _initialTask(
+          taskDetail['files'][0]['uris'][0]['uri'],
+          gid,
+          taskDetail['files'][0]['path'],
+          TaskStatus.active,
+        );
+        _active.value = add(active, task);
+        checkTaskStatus(task);
+      } else if ([...waiting].any((ele) => ele.gid == gid)) {
+        final task = waiting.firstWhere((element) => element.gid == gid);
+        setTaskStatus(task, TaskStatus.active);
       }
-      _active.value = tActive;
     }
   }
 
@@ -79,18 +79,20 @@ class TaskList {
             final task = await _initialTask(
               un['files'][0]['uris'][0]['uri'],
               gid,
+              un['files'][0]['path'],
               TaskStatus.waiting,
+            );
+            waiting.add(task);
+          } else if (un['status'] == 'waiting') {
+            final task = await _initialTask(
+              un['files'][0]['uris'][0]['uri'],
+              gid,
+              un['files'][0]['path'],
+              TaskStatus.paused,
             );
             waiting.add(task);
           }
         }
-      }
-    }
-    final wList = List<Task>.from(waiting);
-    for (var task in wList) {
-      if (!active.any((element) => element.gid == task.gid)) {
-        setTaskStatus(task, TaskStatus.active);
-        waiting.remove(task);
       }
     }
   }
@@ -117,12 +119,7 @@ class TaskList {
   }
 
   List<int> getTaskNum() {
-    final list = [
-      active.length,
-      waiting.length,
-      paused.length,
-      complete.length,
-    ];
+    final list = [active.length, waiting.length, complete.length];
     return list;
   }
 
@@ -151,7 +148,7 @@ class TaskList {
   //继续所有任务
   void resumeAll() async {
     await a2c.resumeAll();
-    final copyPaused = List<Task>.from(paused);
+    final copyPaused = List<Task>.from(waiting);
 
     for (var task in copyPaused) {
       setTaskStatus(task, TaskStatus.waiting);
@@ -183,30 +180,27 @@ class TaskList {
       case TaskStatus.waiting:
         task.status.value = TaskStatus.waiting;
         _active.value = remove(active, task);
-        _paused.value = remove(paused, task);
+
         break;
       case TaskStatus.active:
         task.status.value = TaskStatus.active;
-        _paused.value = remove(paused, task);
+        _active.value = add(active, task);
         _waiting.value = remove(waiting, task);
         break;
       case TaskStatus.paused:
         task.status.value = TaskStatus.paused;
         _active.value = remove(active, task);
-        _waiting.value = remove(waiting, task);
-        _paused.value = add(paused, task);
+        _waiting.value = add(waiting, task);
         break;
       case TaskStatus.complete:
         task.status.value = TaskStatus.complete;
         _active.value = remove(active, task);
-        _paused.value = remove(paused, task);
         _waiting.value = remove(waiting, task);
         _complete.value = add(complete, task);
         break;
       case TaskStatus.remove:
         task.status.value = TaskStatus.remove;
         _active.value = remove(active, task);
-        _paused.value = remove(paused, task);
         _waiting.value = remove(waiting, task);
         _complete.value = remove(complete, task);
         break;
@@ -225,11 +219,12 @@ class TaskList {
   Future<Task> _initialTask(
     String url,
     String gid,
+    String sPath,
     TaskStatus taskStatus,
   ) async {
     final status = await a2c.tellStatus(gid);
     final fileName = _getFileName(status);
-    final savePath = "${config.savePath}/$fileName";
+    final savePath = sPath;
     final completedLength = int.parse(status['completedLength'] ?? 0);
     final totalLength = int.parse(status['totalLength'] ?? 0);
     final downloadSpeed = double.parse(status['downloadSpeed'] ?? 0);

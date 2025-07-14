@@ -61,11 +61,6 @@ class PageInfo {
           tag: SideSubItemStatus.waiting,
         ),
         SideSubItemInfo(
-          icon: Icons.pause,
-          title: "已暂停",
-          tag: SideSubItemStatus.paused,
-        ),
-        SideSubItemInfo(
           icon: Icons.download_done,
           title: "已完成",
           tag: SideSubItemStatus.complete,
@@ -126,7 +121,6 @@ class SideSubItemInfo {
 class SideSubItemStatus {
   static const String active = "active";
   static const String waiting = "waiting";
-  static const String paused = "paused";
   static const String complete = "complete";
   static const String setting = "setting";
   static const String about = "about";

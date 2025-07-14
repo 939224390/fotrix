@@ -34,9 +34,6 @@ Widget buildMainTitle(String text) {
   return Padding(padding: const EdgeInsets.all(12.0), child: buildText(text));
 }
 
-Widget buildTaskCard(Widget child) {
-  return Card(color: ColorTheme.cardColor.value, child: child);
-}
 
 Widget buildSavePathBtn(void Function()? onPressed, Widget child) {
   return ElevatedButton(

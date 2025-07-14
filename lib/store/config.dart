@@ -127,9 +127,9 @@ class Config {
       powerBoot = config['powerBoot'] ?? powerBoot;
       maxDown = config['maxDown'] ?? maxDown;
 
-      await runLog.log("加载配置文件");
+      await logger.info("加载配置文件");
     } catch (e) {
-      await runLog.log("加载配置文件失败 $e");
+      await logger.error("加载配置文件失败 $e");
     }
   }
 
@@ -148,7 +148,7 @@ class Config {
         }),
       );
     } catch (e) {
-      await runLog.log("保存配置文件失败 $e");
+      await logger.error("保存配置文件失败 $e");
     }
   }
 }

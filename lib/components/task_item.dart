@@ -1,4 +1,3 @@
-import "dart:io";
 import "package:flutter/material.dart";
 import "package:fotrix/utils/common.dart";
 import "package:fotrix/store/config.dart";
@@ -13,43 +12,77 @@ class TaskItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch(
-      (_) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-        child: buildTaskCard(
-          ListTile(
-            leading: IconButton(
-              color: ColorTheme.textColor.value,
-              icon: _buildDownloadButton(task),
-              onPressed: () {
-                if (task.status.value == TaskStatus.active) {
-                  taskList.stopTask(task);
-                } else if (task.status.value == TaskStatus.waiting) {
-                } else if (task.status.value == TaskStatus.paused) {
-                  taskList.resumeTask(task);
-                } else {
-                  final path = config.savePath.replaceAll("/", "\\");
-                  Process.run("explorer", [path]);
-                }
-              },
-            ),
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                buildText(task.name),
-                buildText(task.progress.watch(context)),
-              ],
-            ),
-            subtitle: _buildSizePart(task),
-            trailing: IconButton(
-              color: ColorTheme.textColor.value,
-              onPressed: () {
-                taskList.deleteTask(task);
-              },
-              icon: Icon(Icons.delete),
-            ),
-          ),
+      (_) => _buildTaskItem(
+        _buildItemDetail(
+          _buildOpButton(task),
+          _buildTaskTitle(),
+          _buildSizePart(task),
+          _buildDeleteButton(),
         ),
       ),
+    );
+  }
+
+  Widget _buildTaskItem(Widget child) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      child: Card(color: ColorTheme.cardColor.value, child: child),
+    );
+  }
+
+  Widget _buildItemDetail(
+    Widget leading,
+    Widget title,
+    Widget subtitle,
+    Widget trailing,
+  ) {
+    return ListTile(
+      leading: leading,
+      title: title,
+      subtitle: subtitle,
+      trailing: trailing,
+    );
+  }
+
+  Widget _buildOpButton(Task task) {
+    IconData icon;
+    switch (task.status.value) {
+      case TaskStatus.active:
+        icon = Icons.file_download;
+        break;
+      case TaskStatus.waiting:
+        icon = Icons.stop;
+        break;
+      case TaskStatus.paused:
+        icon = Icons.stop;
+        break;
+      case TaskStatus.complete:
+        icon = Icons.download_done;
+        break;
+      case _:
+        icon = Icons.download_done;
+    }
+
+    return IconButton(
+      color: ColorTheme.textColor.value,
+      icon: Icon(icon),
+      onPressed: () async {
+        if (task.status.value == TaskStatus.active) {
+          taskList.stopTask(task);
+        } else if (task.status.value == TaskStatus.waiting) {
+        } else if (task.status.value == TaskStatus.paused) {
+          taskList.resumeTask(task);
+        } else {
+          print(task.savePath);
+        }
+      },
+    );
+  }
+
+  Widget _buildTaskTitle() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [buildText(task.name), buildText(task.progress.value)],
     );
   }
 
@@ -74,15 +107,13 @@ class TaskItem extends StatelessWidget {
     }
   }
 
-  Widget _buildDownloadButton(Task task) {
-    if (task.status.value == TaskStatus.active) {
-      return Icon(Icons.file_download);
-    } else if (task.status.value == TaskStatus.waiting) {
-      return Icon(Icons.stop);
-    } else if (task.status.value == TaskStatus.paused) {
-      return Icon(Icons.stop);
-    } else {
-      return Icon(Icons.download_done);
-    }
+  Widget _buildDeleteButton() {
+    return IconButton(
+      color: ColorTheme.textColor.value,
+      onPressed: () {
+        taskList.deleteTask(task);
+      },
+      icon: Icon(Icons.delete),
+    );
   }
 }

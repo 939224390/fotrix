@@ -132,46 +132,51 @@ class _MainSettingState extends State<MainSetting> {
       padding: const EdgeInsets.all(15.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorTheme.buttonColor.value,
-              ),
-              onPressed: () {
-                config.threadCount = int.parse(_thCtrler.text);
-                config.maxDown = int.parse(_mDCtrler.text);
-                setState(() {
-                  _thCtrler.text = config.threadCount.toString();
-                  _mDCtrler.text = config.maxDown.toString();
-                  config.savePath = _tmpPath;
-                  config.powerBoot = pb;
-                });
-                final snackBar = SnackBar(content: Text("内容已保存"));
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                config.saveConfig();
-              },
-              child: Text("保存"),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: ColorTheme.buttonColor.value,
-              ),
-              onPressed: () {
-                setState(() {
-                  _thCtrler.text = config.threadCount.toString();
-                  _tmpPath = config.savePath;
-                  pb = config.powerBoot;
-                });
-              },
-              child: Text("取消"),
-            ),
-          ),
-        ],
+        children: [_buildSaveButton(), _buildCancelButton()],
+      ),
+    );
+  }
+
+  Widget _buildSaveButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorTheme.buttonColor.value,
+        ),
+        onPressed: () {
+          config.threadCount = int.parse(_thCtrler.text);
+          config.maxDown = int.parse(_mDCtrler.text);
+          setState(() {
+            _thCtrler.text = config.threadCount.toString();
+            _mDCtrler.text = config.maxDown.toString();
+            config.savePath = _tmpPath;
+            config.powerBoot = pb;
+          });
+          final snackBar = SnackBar(content: Text("内容已保存"));
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          config.saveConfig();
+        },
+        child: Text("保存"),
+      ),
+    );
+  }
+
+  Widget _buildCancelButton() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: ColorTheme.buttonColor.value,
+        ),
+        onPressed: () {
+          setState(() {
+            _thCtrler.text = config.threadCount.toString();
+            _tmpPath = config.savePath;
+            pb = config.powerBoot;
+          });
+        },
+        child: Text("取消"),
       ),
     );
   }

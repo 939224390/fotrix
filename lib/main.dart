@@ -21,7 +21,9 @@ void main() async {
     // await windowManager.hide();
     await windowManager.focus();
   });
-  await runLog.createLog();
+
+
+  await logger.initLog();
   await config.loadConfig();
 
   await aria2Client.start();

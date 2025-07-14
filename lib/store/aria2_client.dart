@@ -1,18 +1,19 @@
 import "dart:async";
 import "dart:convert";
 import "dart:io";
-import "package:flutter/foundation.dart";
 import "package:fotrix/store/logger.dart";
 import "package:fotrix/utils/cross.dart";
 import "package:fotrix/store/config.dart";
 import "package:fotrix/store/task_list.dart";
 import 'package:dio/dio.dart';
+import "package:web_socket_channel/io.dart";
 
 class Aria2Server {
   final String httpUrl = "http://localhost:16800/jsonrpc";
-  final String? secret = '';
+  final String wsUrl = "ws://localhost:16800/jsonrpc";
   final Duration timeout = Duration(seconds: 10);
   final Dio dio = Dio();
+  IOWebSocketChannel? wsChannel;
   Process? aria2Process;
 
   start() async {
@@ -20,11 +21,23 @@ class Aria2Server {
     if (isRunning) {
       final v = await send('aria2.getVersion');
       if (v != -1) {
+        wsChannel = IOWebSocketChannel.connect(wsUrl);
         return;
       }
     }
 
     await _startAria2();
+    wsChannel = IOWebSocketChannel.connect(wsUrl);
+  }
+
+  listen() async {
+    wsChannel!.stream.listen((data) {
+      final res = jsonDecode(data);
+      if (res['method'] == 'aria2.onDownloadStart') {
+        final list = res['params'];
+        taskList.checkActive(list);
+      }
+    });
   }
 
   Future<dynamic> send(String method, [List<dynamic>? params]) async {
@@ -45,17 +58,51 @@ class Aria2Server {
       if (response.statusCode == 200) {
         final data = json.decode(response.data);
         if (data['error'] != null) {
-          runLog.log("Aria2请求错误: ${data['error']}");
+          logger.error("Aria2请求错误: ${data['error']}");
           return -1;
         }
         return data['result'];
       } else {
-        runLog.log('HTTP error: ${response.statusCode}');
+        logger.error('HTTP error: ${response.statusCode}');
         return -1;
       }
     } catch (e) {
-      runLog.log("请求失败: $e");
+      logger.error("请求失败: $e");
       return -1;
+    }
+  }
+
+  writeConf() async {
+    try {
+      final aria2ConfPath = await Cross().getAria2ConfPath();
+      final aria2LogPath = await Cross().getAria2LogPath();
+      final aria2Conf = File(aria2ConfPath);
+
+      final confContent = StringBuffer();
+      confContent.write("enable-rpc=true\n");
+      confContent.write("rpc-allow-origin-all=true\n");
+      confContent.write("rpc-listen-all=true\n");
+      confContent.write("rpc-max-request-size=10M\n");
+      confContent.write("rpc-save-upload-metadata=true\n");
+      confContent.write("min-split-size=1M\n");
+      confContent.write("disk-cache=16M\n");
+      confContent.write("file-allocation=trunc\n");
+      confContent.write("continue=true\n");
+      confContent.write("rpc-listen-port=16800\n");
+      confContent.write("save-session-interval=60\n");
+      confContent.write("max-concurrent-downloads=${config.maxDown}\n");
+      confContent.write("max-connection-per-server=${config.threadCount}\n");
+      confContent.write("log=$aria2LogPath\n");
+      confContent.write("dir=${config.savePath}\n");
+      if (!await aria2Conf.exists()) {
+        await aria2Conf.create();
+      } else {
+        await aria2Conf.writeAsString("");
+      }
+
+      await aria2Conf.writeAsString(confContent.toString());
+    } catch (e) {
+      logger.error("创建Aria2配置文件失败 $e");
     }
   }
 
@@ -66,25 +113,17 @@ class Aria2Server {
       // 获取应用目录
       final aria2Path = await Cross().getAria2Path();
       final aria2ConfPath = await Cross().getAria2ConfPath();
-      final aria2LogPath = await Cross().getAria2LogPath();
+      await writeConf();
 
       // 启动 Aria2 进程
       aria2Process = await Process.start(aria2Path, [
-        '--dir=${config.savePath}',
-        '--max-concurrent-downloads=${config.maxDown}',
-        '--max-connection-per-server=${config.threadCount}',
         '--conf-path=$aria2ConfPath',
-        '--rpc-listen-port=16800',
-        '--save-session-interval=60',
-        '--continue=true',
-        '--log=$aria2LogPath',
-        '--log-level=debug',
       ]);
       aria2Process?.stdout.transform(utf8.decoder).listen((data) {
-        debugPrint("Aria2 stdout: $data");
+        data;
       });
     } catch (e) {
-      runLog.log("Aria2服务启动失败 $e");
+      logger.error("Aria2服务启动失败 $e");
     }
   }
 }
@@ -98,18 +137,38 @@ class Aria2Client {
   start() async {
     await a2Server.start();
     await getAria2Version();
+    config.aria2Connected = await isConnecting();
+    Timer.periodic(Duration(seconds: 5), (timer) async {
+      config.aria2Connected = await isConnecting();
+    });
+    await a2Server.listen();
+
+    // await getGlobalOption();
+    // await changeGlobalOption();
+    // await getGlobalOption();
+
     await taskList.start();
   }
 
-  void shutdown() async {
+  shutdown() async {
     await a2Server.send("aria2.shutdown");
     aria2Process?.kill();
   }
 
+  //   Future<void> changeGlobalOption() async {
+  //     await a2Server.send("aria2.changeGlobalOption", [
+  //       {"dir": "D:\\Download"},
+  //     ]);
+  //   }
+
+  //   Future<void> getGlobalOption() async {
+  //     final res = await a2Server.send("aria2.getGlobalOption");
+  //   }
+
   Future<void> getAria2Version() async {
     final res = await a2Server.send('aria2.getVersion');
     if (res == -1) {
-      runLog.log("获取Aria2版本失败");
+      logger.error("获取Aria2版本失败");
       return;
     }
     config.aria2Version = res['version'];

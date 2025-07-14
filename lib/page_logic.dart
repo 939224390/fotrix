@@ -19,6 +19,7 @@ class PageLogic {
     pInf.mInd = m;
   }
 
+  //导航栏逻辑
   void navLogic(NavBarItemInfo item) {
     switch (item.tag) {
       case NavBarItemStatus.home:
@@ -42,6 +43,7 @@ class PageLogic {
     }
   }
 
+  //侧边栏逻辑
   void sideLogic(SideSubItemInfo item) {
     switch (item.tag) {
       case SideSubItemStatus.active:
@@ -52,12 +54,8 @@ class PageLogic {
         changeMain(1);
         changeActive(SideSubItemStatus.waiting);
         break;
-      case SideSubItemStatus.paused:
-        changeMain(2);
-        changeActive(SideSubItemStatus.paused);
-        break;
       case SideSubItemStatus.complete:
-        changeMain(3);
+        changeMain(2);
         changeActive(SideSubItemStatus.complete);
         break;
       case SideSubItemStatus.setting:

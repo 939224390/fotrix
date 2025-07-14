@@ -35,7 +35,7 @@ class Cross {
         await config.saveConfig();
       }
     } catch (e) {
-      await runLog.log("创建配置文件失败 $e");
+      await logger.error("创建配置文件失败 $e");
     }
   }
 
@@ -128,7 +128,7 @@ class Cross {
         return false;
       }
     } catch (e) {
-      await runLog.log("检查Aria2进程失败: $e");
+      await logger.error("检查Aria2进程失败: $e");
       return false;
     }
   }

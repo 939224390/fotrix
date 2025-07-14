@@ -18,8 +18,7 @@ class MainTask extends StatelessWidget {
     () => switch (pInf.mInd) {
       0 => taskList.active,
       1 => taskList.waiting,
-      2 => taskList.paused,
-      3 => taskList.complete,
+      2 => taskList.complete,
       _ => [],
     },
   );

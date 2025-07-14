@@ -15,7 +15,6 @@ class SideTask extends StatelessWidget {
     () => [
       taskList.active.length,
       taskList.waiting.length,
-      taskList.paused.length,
       taskList.complete.length,
     ],
   );
