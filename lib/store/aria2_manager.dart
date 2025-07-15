@@ -11,10 +11,6 @@ class Aria2Manager {
   start() async {
     await a2c.start();
     await getAria2Version();
-    config.aria2Connected = await isConnecting();
-    Timer.periodic(Duration(seconds: 5), (timer) async {
-      config.aria2Connected = await isConnecting();
-    });
     await a2c.listen();
     await taskList.start();
   }
@@ -38,6 +34,7 @@ class Aria2Manager {
     final res = await a2c.send('aria2.getVersion');
     if (res == -1) {
       logger.error("获取Aria2版本失败");
+      config.aria2Version = "未连接";
       return;
     }
     config.aria2Version = res['version'];

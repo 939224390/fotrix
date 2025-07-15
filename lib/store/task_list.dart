@@ -15,10 +15,12 @@ class TaskList {
   List<Task> get complete => _complete.value;
   List<Task> get waiting => _waiting.value;
 
-
   start() async {
     Timer.periodic(Duration(seconds: 1), (Timer timer) async {
       await checkWaiting();
+    });
+    Timer.periodic(Duration(seconds: 5), (timer) async {
+      await a2M.getAria2Version();
     });
   }
 

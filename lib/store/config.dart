@@ -16,14 +16,12 @@ class Config {
   int maxDown = 5;
 
   late final _aria2Version = signal("");
-  late final _aria2Connected = signal(false);
   String version = "0.1.2";
 
   bool get darkMode => _darkMode.value;
   int get threadCount => _threadCount;
   bool get powerBoot => _powerBoot;
   String get aria2Version => _aria2Version.value;
-  bool get aria2Connected => _aria2Connected.value;
 
   set threadCount(int count) {
     _threadCount = (count <= 16 && count >= 0) ? count : 1;
@@ -42,9 +40,7 @@ class Config {
     _aria2Version.value = value;
   }
 
-  set aria2Connected(bool value) {
-    _aria2Connected.value = value;
-  }
+
 
   //切换模式
   void changeTheme() {

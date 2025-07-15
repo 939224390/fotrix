@@ -42,7 +42,6 @@ class _MainSettingState extends State<MainSetting> {
           _buildMaxDownload(),
           _buildThCount(),
           _buildSavePath(),
-          _buildAriaConneted(),
         ], _buildSaveCanelButton()),
       ],
     );
@@ -117,15 +116,6 @@ class _MainSettingState extends State<MainSetting> {
         Expanded(
           child: buildSavePathBtn(_selectDirectory, buildText(_tmpPath)),
         ),
-      ],
-    );
-  }
-
-  Widget _buildAriaConneted() {
-    return Row(
-      children: [
-        _buildSec("aria2连接状态"),
-        buildText(config.aria2Connected ? "已连接" : "未连接"),
       ],
     );
   }
