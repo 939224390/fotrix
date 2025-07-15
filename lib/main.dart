@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/store/aria2_client.dart';
+import 'package:fotrix/store/aria2_manager.dart';
 import 'package:fotrix/store/config.dart';
 import 'package:fotrix/store/logger.dart';
 import 'package:fotrix/store/tray_service.dart';
@@ -22,11 +22,9 @@ void main() async {
     await windowManager.focus();
   });
 
-
   await logger.initLog();
   await config.loadConfig();
-
-  await aria2Client.start();
+  await a2M.start();
 
   runApp(const MyApp());
 }
@@ -47,17 +45,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     WidgetsBinding.instance.removeObserver(this);
-    aria2Client.shutdown();
+    await a2M.shutdown();
     super.dispose();
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.detached) {
       // 应用关闭时调用关闭 Aria2 服务的方法
-      aria2Client.shutdown();
+      await a2M.shutdown();
     }
   }
 

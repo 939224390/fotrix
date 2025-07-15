@@ -1,5 +1,5 @@
 import "dart:io";
-import "package:fotrix/store/aria2_client.dart";
+import "package:fotrix/store/aria2_manager.dart";
 import "package:tray_manager/tray_manager.dart";
 import "package:window_manager/window_manager.dart";
 
@@ -24,7 +24,7 @@ class TrayService {
           MenuItem(
             label: '退出',
             onClick: (_) async {
-              await aria2Client.shutdown();
+              await a2M.shutdown();
               exit(0);
             },
           ),

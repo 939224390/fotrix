@@ -52,17 +52,6 @@ class Cross {
     }
   }
 
-  //获取aria2配置文件
-  Future<ByteData> getAria2Conf() async {
-    if (Platform.isWindows) {
-      return await rootBundle.load('assets/aria2/win/aria2.conf');
-    } else if (Platform.isMacOS) {
-      return await rootBundle.load('assets/aria2/mac/aria2.conf');
-    } else {
-      return await rootBundle.load('assets/aria2/linux/aria2.conf');
-    }
-  }
-
   Future<String> getAria2LogPath() async {
     return '${await getDocPath()}/aria2/aria2.log';
   }
@@ -95,11 +84,8 @@ class Cross {
 
       //将aria2从asset复制出来
       ByteData aria2Data = await Cross().getAria2();
-      ByteData aria2ConfData = await Cross().getAria2Conf();
       final aria2Bytes = aria2Data.buffer.asUint8List();
-      final aria2ConfBytes = aria2ConfData.buffer.asUint8List();
       await aria2.writeAsBytes(aria2Bytes);
-      await aria2Conf.writeAsBytes(aria2ConfBytes);
 
       // 给可执行文件添加执行权限
       if (Platform.isLinux || Platform.isMacOS) {
@@ -131,5 +117,10 @@ class Cross {
       await logger.error("检查Aria2进程失败: $e");
       return false;
     }
+  }
+
+  String editPath(String path) {
+    if (Platform.isWindows) return path.replaceAll("/", "\\");
+    return path;
   }
 }

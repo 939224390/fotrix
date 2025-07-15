@@ -8,7 +8,7 @@ import "package:fotrix/store/task_list.dart";
 import 'package:dio/dio.dart';
 import "package:web_socket_channel/io.dart";
 
-class Aria2Server {
+class Aria2Client {
   final String httpUrl = "http://localhost:16800/jsonrpc";
   final String wsUrl = "ws://localhost:16800/jsonrpc";
   final Duration timeout = Duration(seconds: 10);
@@ -126,112 +126,9 @@ class Aria2Server {
       logger.error("Aria2服务启动失败 $e");
     }
   }
-}
-
-class Aria2Client {
-  final a2Server = Aria2Server();
-
-  Process? aria2Process;
-
-  //启动aria2服务
-  start() async {
-    await a2Server.start();
-    await getAria2Version();
-    config.aria2Connected = await isConnecting();
-    Timer.periodic(Duration(seconds: 5), (timer) async {
-      config.aria2Connected = await isConnecting();
-    });
-    await a2Server.listen();
-
-    // await getGlobalOption();
-    // await changeGlobalOption();
-    // await getGlobalOption();
-
-    await taskList.start();
-  }
 
   shutdown() async {
-    await a2Server.send("aria2.shutdown");
+    await send("aria2.shutdonw");
     aria2Process?.kill();
   }
-
-  //   Future<void> changeGlobalOption() async {
-  //     await a2Server.send("aria2.changeGlobalOption", [
-  //       {"dir": "D:\\Download"},
-  //     ]);
-  //   }
-
-  //   Future<void> getGlobalOption() async {
-  //     final res = await a2Server.send("aria2.getGlobalOption");
-  //   }
-
-  Future<void> getAria2Version() async {
-    final res = await a2Server.send('aria2.getVersion');
-    if (res == -1) {
-      logger.error("获取Aria2版本失败");
-      return;
-    }
-    config.aria2Version = res['version'];
-  }
-
-  Future<bool> isConnecting() async {
-    try {
-      final res = await a2Server.send('aria2.getVersion');
-      if (res == -1) {
-        return false;
-      }
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  //添加任务
-  Future<String> addTask(String url) async {
-    return await a2Server.send('aria2.addUri', [
-      [url],
-    ]);
-  }
-
-  //获取下载列表
-  Future<List<dynamic>> tellActive() async {
-    return await a2Server.send('aria2.tellActive');
-  }
-
-  //获取等待列表
-  Future<List<dynamic>> tellWaiting(int start, int num) async {
-    return await a2Server.send('aria2.tellWaiting', [start, num]);
-  }
-
-  // 获取下载状态
-  Future<Map<String, dynamic>> tellStatus(String gid) async {
-    return await a2Server.send('aria2.tellStatus', [gid]);
-  }
-
-  // 暂停任务
-  Future<String> pauseTask(String gid) async {
-    return await a2Server.send('aria2.pause', [gid]);
-  }
-
-  //暂停全部任务
-  Future<String> pauseAll() async {
-    return await a2Server.send('aria2.pauseAll');
-  }
-
-  //继续任务
-  Future<String> resumeTask(String gid) async {
-    return await a2Server.send('aria2.unpause', [gid]);
-  }
-
-  //继续全部任务
-  Future<String> resumeAll() async {
-    return await a2Server.send('aria2.unpauseAll');
-  }
-
-  //删除任务
-  Future<String> removeTask(String gid) async {
-    return await a2Server.send('aria2.remove', [gid]);
-  }
 }
-
-Aria2Client aria2Client = Aria2Client();

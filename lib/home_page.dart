@@ -9,7 +9,7 @@ import 'package:fotrix/components/window_control.dart';
 import 'package:fotrix/page_logic.dart';
 import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/tray_service.dart';
-import 'package:fotrix/store/config.dart';
+import 'package:fotrix/utils/color_mode.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:tray_manager/tray_manager.dart';
 

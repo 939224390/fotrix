@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/store/config.dart';
+import 'package:fotrix/utils/color_mode.dart';
 
 //默认字体
 Widget buildText(String text) {

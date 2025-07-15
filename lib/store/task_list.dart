@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:fotrix/store/aria2_client.dart';
+import 'package:fotrix/store/aria2_manager.dart';
 import 'package:signals/signals.dart';
 import 'task.dart';
 
@@ -15,7 +15,6 @@ class TaskList {
   List<Task> get complete => _complete.value;
   List<Task> get waiting => _waiting.value;
 
-  final a2c = aria2Client;
 
   start() async {
     Timer.periodic(Duration(seconds: 1), (Timer timer) async {
@@ -31,8 +30,8 @@ class TaskList {
     }
 
     //创建任务后加入等待队列
-    final gid = await a2c.addTask(url);
-    final status = await a2c.tellStatus(gid);
+    final gid = await a2M.addTask(url);
+    final status = await a2M.tellStatus(gid);
     final task = await _initialTask(
       url,
       gid,
@@ -52,7 +51,7 @@ class TaskList {
     for (var item in list) {
       final gid = item['gid'];
       if (![...active, ...waiting].any((ele) => ele.gid == gid)) {
-        final taskDetail = await a2c.tellStatus(gid);
+        final taskDetail = await a2M.tellStatus(gid);
         final task = await _initialTask(
           taskDetail['files'][0]['uris'][0]['uri'],
           gid,
@@ -70,7 +69,7 @@ class TaskList {
 
   //更新等待列表
   checkWaiting() async {
-    final unActice = await a2c.tellWaiting(0, 100);
+    final unActice = await a2M.tellWaiting(0, 100);
     if (unActice.isNotEmpty) {
       for (var un in unActice) {
         final gid = un['gid'];
@@ -102,7 +101,7 @@ class TaskList {
     bool isFinish = false;
     final cnt = Timer.periodic(Duration(seconds: 1), (Timer time) async {
       if (task.status.value == TaskStatus.active) {
-        final status = await a2c.tellStatus(task.gid);
+        final status = await a2M.tellStatus(task.gid);
 
         task.completedLength.value = int.parse(status['completedLength'] ?? 0);
         task.totalLength.value = int.parse(status['totalLength'] ?? 0);
@@ -127,12 +126,12 @@ class TaskList {
   void stopTask(Task task) async {
     setTaskStatus(task, TaskStatus.paused);
 
-    await a2c.pauseTask(task.gid);
+    await a2M.pauseTask(task.gid);
   }
 
   //暂停所有任务
   void stopAll() async {
-    await a2c.pauseAll();
+    await a2M.pauseAll();
     for (var task in active) {
       setTaskStatus(task, TaskStatus.paused);
     }
@@ -142,12 +141,12 @@ class TaskList {
   void resumeTask(Task task) async {
     setTaskStatus(task, TaskStatus.waiting);
 
-    await a2c.resumeTask(task.gid);
+    await a2M.resumeTask(task.gid);
   }
 
   //继续所有任务
   void resumeAll() async {
-    await a2c.resumeAll();
+    await a2M.resumeAll();
     final copyPaused = List<Task>.from(waiting);
 
     for (var task in copyPaused) {
@@ -163,7 +162,7 @@ class TaskList {
   //删除任务
   void deleteTask(Task task) async {
     if (task.status.value != TaskStatus.complete) {
-      await a2c.removeTask(task.gid);
+      await a2M.removeTask(task.gid);
     }
     setTaskStatus(task, TaskStatus.remove);
 
@@ -222,7 +221,7 @@ class TaskList {
     String sPath,
     TaskStatus taskStatus,
   ) async {
-    final status = await a2c.tellStatus(gid);
+    final status = await a2M.tellStatus(gid);
     final fileName = _getFileName(status);
     final savePath = sPath;
     final completedLength = int.parse(status['completedLength'] ?? 0);

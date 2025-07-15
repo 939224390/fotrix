@@ -1,5 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:fotrix/utils/color_mode.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/store/config.dart';
 
@@ -22,10 +23,12 @@ class _MainSettingState extends State<MainSetting> {
   }
 
   void _initialValues() async {
-    _thCtrler.text = config.threadCount.toString();
-    _mDCtrler.text = config.maxDown.toString();
-    _tmpPath = config.savePath;
-    pb = config.powerBoot;
+    setState(() {
+      _thCtrler.text = config.threadCount.toString();
+      _mDCtrler.text = config.maxDown.toString();
+      _tmpPath = config.savePath;
+      pb = config.powerBoot;
+    });
   }
 
   @override
@@ -94,7 +97,7 @@ class _MainSettingState extends State<MainSetting> {
   Widget _buildThCount() {
     return Row(
       children: [
-        _buildSec("下载线程(1-64):"),
+        _buildSec("下载线程(1-16):"),
         Expanded(
           child: TextField(
             controller: _thCtrler,

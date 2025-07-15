@@ -1,8 +1,10 @@
 import "package:flutter/material.dart";
+import "package:fotrix/utils/color_mode.dart";
 import "package:fotrix/utils/common.dart";
-import "package:fotrix/store/config.dart";
 import "package:fotrix/store/task.dart";
 import "package:fotrix/store/task_list.dart";
+import "package:open_file/open_file.dart";
+import "package:process_run/stdio.dart";
 import "package:signals/signals_flutter.dart";
 
 class TaskItem extends StatelessWidget {
@@ -41,6 +43,11 @@ class TaskItem extends StatelessWidget {
       title: title,
       subtitle: subtitle,
       trailing: trailing,
+      onLongPress: () {
+        if (task.status.value == TaskStatus.complete) {
+          OpenFile.open(task.savePath.replaceAll("/", "\\"));
+        }
+      },
     );
   }
 
@@ -73,7 +80,9 @@ class TaskItem extends StatelessWidget {
         } else if (task.status.value == TaskStatus.paused) {
           taskList.resumeTask(task);
         } else {
-          print(task.savePath);
+          Process.run("explorer", [
+            "/select,${task.savePath.replaceAll("/", "\\")}",
+          ]);
         }
       },
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/store/config.dart';
+import 'package:fotrix/utils/color_mode.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/components/task_item.dart';
 import 'package:fotrix/store/page_info.dart';

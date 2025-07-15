@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/store/config.dart';
 import 'package:fotrix/store/page_info.dart';
+import 'package:fotrix/utils/color_mode.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:signals/signals_flutter.dart';
 
@@ -63,7 +63,7 @@ class SideSetting extends StatelessWidget {
         child: ElevatedButton(
           onPressed: func as void Function()?,
           style: ElevatedButton.styleFrom(
-            backgroundColor: config.activeColor(index).value,
+            backgroundColor: colorMode.activeColor(index).value,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
