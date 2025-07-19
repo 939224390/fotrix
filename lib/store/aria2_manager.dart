@@ -8,14 +8,14 @@ class Aria2Manager {
   final a2c = Aria2Client();
 
   //启动aria2服务
-  start() async {
+  Future<void> start() async {
     await a2c.start();
     await getAria2Version();
     await a2c.listen();
     await taskList.start();
   }
 
-  updateConfig() async {
+  Future<void> updateConfig() async {
     await a2c.send("aria2.changeGlobalOption", [
       {
         'dir': config.savePath,
@@ -26,7 +26,7 @@ class Aria2Manager {
     await a2c.writeConf();
   }
 
-  shutdown() async {
+  Future<void> shutdown() async {
     await a2c.shutdown();
   }
 

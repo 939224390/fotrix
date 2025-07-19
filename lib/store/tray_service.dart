@@ -1,5 +1,6 @@
 import "dart:io";
 import "package:fotrix/store/aria2_manager.dart";
+import "package:fotrix/store/page_info.dart";
 import "package:tray_manager/tray_manager.dart";
 import "package:window_manager/window_manager.dart";
 
@@ -19,8 +20,23 @@ class TrayService {
     await _tm.setContextMenu(
       Menu(
         items: [
-          MenuItem(label: 'Fotrix', onClick: (_) => windowManager.show()),
+          MenuItem(
+            label: 'Fotrix',
+            onClick: (_) {
+              pInf.mInd = 0;
+              pInf.pInd = 0;
+              windowManager.show();
+            },
+          ),
           MenuItem.separator(),
+          MenuItem(
+            label: "设置",
+            onClick: (_) {
+              pInf.mInd = 0;
+              pInf.pInd = 1;
+              windowManager.show();
+            },
+          ),
           MenuItem(
             label: '退出',
             onClick: (_) async {

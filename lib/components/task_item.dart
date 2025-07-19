@@ -91,7 +91,10 @@ class TaskItem extends StatelessWidget {
   Widget _buildTaskTitle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [buildText(task.name), buildText(task.progress.value)],
+      children: [
+        Expanded(child: buildText(task.name)),
+        buildText(task.progress.value),
+      ],
     );
   }
 
@@ -101,8 +104,13 @@ class TaskItem extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           buildText(' ${(task.dlSize.value)}/${task.totalSize.value}'),
-          buildText(
-            '速度: ${task.formattedSpeed.value} - 剩余: ${task.remainTime.value}',
+          Expanded(
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: buildText(
+                '速度: ${task.formattedSpeed.value} - 剩余: ${task.remainTime.value}',
+              ),
+            ),
           ),
         ],
       );

@@ -15,7 +15,7 @@ class TaskList {
   List<Task> get complete => _complete.value;
   List<Task> get waiting => _waiting.value;
 
-  start() async {
+  Future<void> start() async {
     Timer.periodic(Duration(seconds: 1), (Timer timer) async {
       await checkWaiting();
     });
@@ -49,7 +49,7 @@ class TaskList {
   }
 
   //更新下载列表
-  checkActive(List<dynamic> list) async {
+  Future<void> checkActive(List<dynamic> list) async {
     for (var item in list) {
       final gid = item['gid'];
       if (![...active, ...waiting].any((ele) => ele.gid == gid)) {
@@ -70,7 +70,7 @@ class TaskList {
   }
 
   //更新等待列表
-  checkWaiting() async {
+  Future<void> checkWaiting() async {
     final unActice = await a2M.tellWaiting(0, 100);
     if (unActice.isNotEmpty) {
       for (var un in unActice) {
@@ -98,23 +98,24 @@ class TaskList {
     }
   }
 
+  Future<void> updateTaskStatus(Task task) async {
+    final status = await a2M.tellStatus(task.gid);
+    task.completedLength.value = int.parse(status['completedLength'] ?? 0);
+    task.totalLength.value = int.parse(status['totalLength'] ?? 0);
+    task.downloadSpeed.value = double.parse(status['downloadSpeed'] ?? 0);
+    if (task.completedLength.value == task.totalLength.value) {
+      completeTask(task);
+    }
+  }
+
   //监听任务状态
   void checkTaskStatus(Task task) async {
-    bool isFinish = false;
     final cnt = Timer.periodic(Duration(seconds: 1), (Timer time) async {
       if (task.status.value == TaskStatus.active) {
-        final status = await a2M.tellStatus(task.gid);
-
-        task.completedLength.value = int.parse(status['completedLength'] ?? 0);
-        task.totalLength.value = int.parse(status['totalLength'] ?? 0);
-        task.downloadSpeed.value = double.parse(status['downloadSpeed'] ?? 0);
-        if (task.completedLength.value == task.totalLength.value) {
-          completeTask(task);
-          isFinish = true;
-        }
+        updateTaskStatus(task);
       }
     });
-    if (isFinish) {
+    if (task.status.value == TaskStatus.complete) {
       cnt.cancel();
     }
   }
@@ -129,6 +130,7 @@ class TaskList {
     setTaskStatus(task, TaskStatus.paused);
 
     await a2M.pauseTask(task.gid);
+    await updateTaskStatus(task);
   }
 
   //暂停所有任务
@@ -136,6 +138,7 @@ class TaskList {
     await a2M.pauseAll();
     for (var task in active) {
       setTaskStatus(task, TaskStatus.paused);
+      await updateTaskStatus(task);
     }
   }
 
@@ -163,6 +166,7 @@ class TaskList {
 
   //删除任务
   void deleteTask(Task task) async {
+    await updateTaskStatus(task);
     if (task.status.value != TaskStatus.complete) {
       await a2M.removeTask(task.gid);
     }

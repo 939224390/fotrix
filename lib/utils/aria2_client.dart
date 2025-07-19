@@ -16,7 +16,7 @@ class Aria2Client {
   IOWebSocketChannel? wsChannel;
   Process? aria2Process;
 
-  start() async {
+  Future<void> start() async {
     final isRunning = await Cross().isAria2Running();
     if (isRunning) {
       final v = await send('aria2.getVersion');
@@ -30,7 +30,7 @@ class Aria2Client {
     wsChannel = IOWebSocketChannel.connect(wsUrl);
   }
 
-  listen() async {
+  Future<void> listen() async {
     wsChannel!.stream.listen((data) {
       final res = jsonDecode(data);
       if (res['method'] == 'aria2.onDownloadStart') {
@@ -72,7 +72,7 @@ class Aria2Client {
     }
   }
 
-  writeConf() async {
+  Future<void> writeConf() async {
     try {
       final aria2ConfPath = await Cross().getAria2ConfPath();
       final aria2LogPath = await Cross().getAria2LogPath();
@@ -106,7 +106,7 @@ class Aria2Client {
     }
   }
 
-  _startAria2() async {
+  Future<void> _startAria2() async {
     try {
       await Cross().createAria2();
 
@@ -127,7 +127,7 @@ class Aria2Client {
     }
   }
 
-  shutdown() async {
+  Future<void> shutdown() async {
     await send("aria2.shutdonw");
     aria2Process?.kill();
   }

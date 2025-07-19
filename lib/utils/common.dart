@@ -3,7 +3,12 @@ import 'package:fotrix/utils/color_mode.dart';
 
 //默认字体
 Widget buildText(String text) {
-  return Text(text, style: TextStyle(color: ColorTheme.textColor.value));
+  return Text(
+    text,
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,
+    style: TextStyle(color: ColorTheme.textColor.value),
+  );
 }
 
 //大号字体
@@ -13,8 +18,6 @@ Widget buildLText(String text) {
     style: TextStyle(color: ColorTheme.textColor.value, fontSize: 20),
   );
 }
-
-
 
 //默认图标
 Widget buildIcon(IconData icon) {
@@ -33,7 +36,6 @@ Widget buildDivider() {
 Widget buildMainTitle(String text) {
   return Padding(padding: const EdgeInsets.all(12.0), child: buildText(text));
 }
-
 
 Widget buildSavePathBtn(void Function()? onPressed, Widget child) {
   return ElevatedButton(

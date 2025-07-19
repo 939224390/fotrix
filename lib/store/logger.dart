@@ -5,19 +5,19 @@ class Logger {
   late String _logPath = "";
   File? logFile;
 
-  initLog() async {
+  Future<void> initLog() async {
     _logPath = await Cross().createLog();
     logFile = File(_logPath);
   }
 
-  checkLog() async {
+  Future<void> checkLog() async {
     logFile = File(_logPath);
     if (!await logFile!.exists()) {
       await initLog();
     }
   }
 
-  info(String msg) async {
+  Future<void> info(String msg) async {
     String time = DateTime.now().toString();
     await checkLog();
     await logFile?.writeAsString(
@@ -26,7 +26,7 @@ class Logger {
     );
   }
 
-  error(String msg) async {
+  Future<void> error(String msg) async {
     String time = DateTime.now().toString();
     await checkLog();
     await logFile?.writeAsString(

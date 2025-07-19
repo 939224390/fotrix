@@ -23,7 +23,7 @@ class Cross {
   }
 
   //创建配置文件件
-  createConfig() async {
+  Future<void> createConfig() async {
     try {
       final dir = Directory(await getDocPath());
       final file = File('${await getDocPath()}/config.json');
@@ -39,7 +39,7 @@ class Cross {
     }
   }
 
-  createList() async {}
+  Future<void> createList() async {}
 
   //获取aria2
   Future<ByteData> getAria2() async {
@@ -70,7 +70,7 @@ class Cross {
   }
 
   //创建aria2
-  createAria2() async {
+  Future<void> createAria2() async {
     final aria2 = File(await getAria2Path());
     final aria2Conf = File(await getAria2ConfPath());
     if (!(await aria2.exists() && await aria2Conf.exists())) {
