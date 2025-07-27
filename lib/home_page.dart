@@ -6,7 +6,7 @@ import 'package:fotrix/components/side_setting.dart';
 import 'package:fotrix/components/side_task.dart';
 import 'package:fotrix/components/main_task.dart';
 import 'package:fotrix/components/window_control.dart';
-import 'package:fotrix/page_logic.dart';
+import 'package:fotrix/logic/page_logic.dart';
 import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/tray_service.dart';
 import 'package:fotrix/utils/color_mode.dart';

@@ -16,16 +16,16 @@ class TaskList {
   List<Task> get waiting => _waiting.value;
 
   Future<void> start() async {
-    Timer.periodic(Duration(seconds: 1), (Timer timer) async {
+    Timer.periodic(Duration(seconds: 1), (_) async {
       await checkWaiting();
     });
-    Timer.periodic(Duration(seconds: 5), (timer) async {
+    Timer.periodic(Duration(seconds: 5), (_) async {
       await a2M.getAria2Version();
     });
   }
 
   //创建任务
-  Future<bool> createTask(String url) async {
+  Future<bool> addTask(String url) async {
     final list = [...active, ...complete, ...waiting];
     if (list.any((element) => element.url == url)) {
       return false;
@@ -35,7 +35,7 @@ class TaskList {
     final gid = await a2M.addTask(url);
     final status = await a2M.tellStatus(gid);
     final task = await _initialTask(
-      url,
+      status['files'][0]['uris'][0]['uri'],
       gid,
       status['files'][0]['path'],
       TaskStatus.waiting,
@@ -49,17 +49,14 @@ class TaskList {
   }
 
   //更新下载列表
-  Future<void> checkActive(List<dynamic> list) async {
+  Future<bool> checkActive(List<dynamic> list) async {
+    bool addList = false;
     for (var item in list) {
       final gid = item['gid'];
       if (![...active, ...waiting].any((ele) => ele.gid == gid)) {
         final taskDetail = await a2M.tellStatus(gid);
-        final task = await _initialTask(
-          taskDetail['files'][0]['uris'][0]['uri'],
-          gid,
-          taskDetail['files'][0]['path'],
-          TaskStatus.active,
-        );
+        final task = await createTask(taskDetail, TaskStatus.active);
+        addList = true;
         _active.value = add(active, task);
         checkTaskStatus(task);
       } else if ([...waiting].any((ele) => ele.gid == gid)) {
@@ -67,6 +64,7 @@ class TaskList {
         setTaskStatus(task, TaskStatus.active);
       }
     }
+    return addList;
   }
 
   //更新等待列表
@@ -77,20 +75,10 @@ class TaskList {
         final gid = un['gid'];
         if (!waiting.any((element) => element.gid == gid)) {
           if (un['status'] == 'waiting') {
-            final task = await _initialTask(
-              un['files'][0]['uris'][0]['uri'],
-              gid,
-              un['files'][0]['path'],
-              TaskStatus.waiting,
-            );
+            final task = await createTask(un, TaskStatus.waiting);
             waiting.add(task);
-          } else if (un['status'] == 'waiting') {
-            final task = await _initialTask(
-              un['files'][0]['uris'][0]['uri'],
-              gid,
-              un['files'][0]['path'],
-              TaskStatus.paused,
-            );
+          } else if (un['status'] == 'paused') {
+            final task = await createTask(un, TaskStatus.paused);
             waiting.add(task);
           }
         }
@@ -98,6 +86,7 @@ class TaskList {
     }
   }
 
+  //更新任务状态
   Future<void> updateTaskStatus(Task task) async {
     final status = await a2M.tellStatus(task.gid);
     task.completedLength.value = int.parse(status['completedLength'] ?? 0);
@@ -108,16 +97,30 @@ class TaskList {
     }
   }
 
+  //初始化任务
+  Future<Task> createTask(dynamic status, TaskStatus taskStatus) async {
+    final task = await _initialTask(
+      status['files'][0]['uris'][0]['uri'],
+      status['gid'],
+      status['files'][0]['path'],
+      taskStatus,
+    );
+    return task;
+  }
+
   //监听任务状态
   void checkTaskStatus(Task task) async {
-    final cnt = Timer.periodic(Duration(seconds: 1), (Timer time) async {
-      if (task.status.value == TaskStatus.active) {
-        updateTaskStatus(task);
+    Timer.periodic(Duration(seconds: 1), (time) async {
+      switch (task.status.value) {
+        case TaskStatus.active:
+          updateTaskStatus(task);
+          break;
+        case TaskStatus.complete:
+          time.cancel();
+          break;
+        case _:
       }
     });
-    if (task.status.value == TaskStatus.complete) {
-      cnt.cancel();
-    }
   }
 
   List<int> getTaskNum() {
@@ -175,9 +178,7 @@ class TaskList {
     await Future.delayed(Duration(seconds: 1));
 
     if (await File(task.tmpPath).exists()) File(task.tmpPath).delete();
-    if (await File(task.savePath).exists()) {
-      File(task.savePath).delete();
-    }
+    if (await File(task.savePath).exists()) File(task.savePath).delete();
   }
 
   void setTaskStatus(Task task, TaskStatus taskStatus) {

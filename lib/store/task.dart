@@ -11,6 +11,7 @@ class Task {
   final Signal<int> totalLength;
   final Signal<double> downloadSpeed;
   final Signal<TaskStatus> status;
+  String get tmpPath => "$savePath.aria2";
 
   late final progress = computed(
     () =>
@@ -27,19 +28,13 @@ class Task {
     () => _calculateSpeed(downloadSpeed.value),
   );
 
-  late final remainTime = computed(() {
-    if (totalLength.value == 0 || downloadSpeed.value == 0) return "0";
-    final remainBytes = totalLength.value - completedLength.value;
-    final remainTime = (remainBytes / downloadSpeed.value).toInt();
-    if (remainTime < 60) {
-      return "$remainTime 秒";
-    } else if (remainTime < 60 * 60) {
-      return "${(remainTime / 60)} 分钟";
-    } else {
-      return "${(remainTime / 60 / 60)} 小时";
-    }
-  });
+  late final remainTime = computed(() => _calRemainTime(this));
 
+  late final sizeRate = computed(() => '${(dlSize.value)}/${totalSize.value}');
+
+  late final speedTime = computed(
+    () => '速度: ${formattedSpeed.value} - 剩余: ${remainTime.value}',
+  );
   Task({
     required this.gid,
     required this.name,
@@ -50,8 +45,6 @@ class Task {
     required this.downloadSpeed,
     required this.status,
   });
-
-  String get tmpPath => "$savePath.aria2";
 }
 
 String _calculateSpeed(double speed) {
@@ -68,7 +61,6 @@ String _calculateSpeed(double speed) {
   }
 }
 
-
 String _formatSize(int size) {
   List units = ['B', 'KB', 'MB', 'GB', 'TB'];
   double res = size.toDouble();
@@ -81,4 +73,17 @@ String _formatSize(int size) {
     }
   }
   return "${res.toStringAsFixed(2)} ${units[i]}";
+}
+
+String _calRemainTime(Task task) {
+  if (task.totalLength.value == 0 || task.downloadSpeed.value == 0) return "0";
+  final remainBytes = task.totalLength.value - task.completedLength.value;
+  final remainTime = (remainBytes / task.downloadSpeed.value).toInt();
+  if (remainTime < 60) {
+    return "$remainTime 秒";
+  } else if (remainTime < 60 * 60) {
+    return "${(remainTime / 60)} 分钟";
+  } else {
+    return "${(remainTime / 60 / 60)} 小时";
+  }
 }

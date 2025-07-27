@@ -78,7 +78,7 @@ class _AddTaskState extends State<AddTask> {
       _buildSnackBar("下载链接不能为空");
       return;
     }
-    final success = await taskList.createTask(_urlCtrler.text);
+    final success = await taskList.addTask(_urlCtrler.text);
     if (!mounted) return;
     if (!success) {
       _buildSnackBar("当前任务已存在");

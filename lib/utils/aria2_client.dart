@@ -2,9 +2,10 @@ import "dart:async";
 import "dart:convert";
 import "dart:io";
 import "package:fotrix/store/logger.dart";
+import "package:fotrix/store/result.dart";
+import "package:fotrix/store/task_list.dart";
 import "package:fotrix/utils/cross.dart";
 import "package:fotrix/store/config.dart";
-import "package:fotrix/store/task_list.dart";
 import 'package:dio/dio.dart';
 import "package:web_socket_channel/io.dart";
 
@@ -20,27 +21,35 @@ class Aria2Client {
     final isRunning = await Cross().isAria2Running();
     if (isRunning) {
       final v = await send('aria2.getVersion');
-      if (v != -1) {
+      if (v.code == 1) {
         wsChannel = IOWebSocketChannel.connect(wsUrl);
+        logger.info('aria2已启动');
         return;
       }
     }
 
     await _startAria2();
     wsChannel = IOWebSocketChannel.connect(wsUrl);
+    logger.info('aria2已启动');
   }
 
   Future<void> listen() async {
-    wsChannel!.stream.listen((data) {
+    wsChannel!.stream.listen((data) async {
       final res = jsonDecode(data);
-      if (res['method'] == 'aria2.onDownloadStart') {
-        final list = res['params'];
-        taskList.checkActive(list);
+      switch (res['method']) {
+        case 'aria2.onDownloadStart':
+          final list = res['params'];
+          await taskList.checkActive(list);
+          break;
+        case "aria2.onDownloadComplete":
+        
+          break;
       }
     });
+
   }
 
-  Future<dynamic> send(String method, [List<dynamic>? params]) async {
+  Future<Result> send(String method, [List<dynamic>? params]) async {
     try {
       final response = await dio
           .post(
@@ -58,17 +67,14 @@ class Aria2Client {
       if (response.statusCode == 200) {
         final data = json.decode(response.data);
         if (data['error'] != null) {
-          logger.error("Aria2请求错误: ${data['error']}");
-          return -1;
+          return Result(-1, "Aria2请求错误: ${data['error']}");
         }
-        return data['result'];
+        return Result(1, data['result']);
       } else {
-        logger.error('HTTP error: ${response.statusCode}');
-        return -1;
+        return Result(-1, "HTTP error: ${response.statusCode}");
       }
     } catch (e) {
-      logger.error("请求失败: $e");
-      return -1;
+      return Result(-1, "请求失败: $e");
     }
   }
 
