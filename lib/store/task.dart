@@ -78,12 +78,12 @@ String _formatSize(int size) {
 String _calRemainTime(Task task) {
   if (task.totalLength.value == 0 || task.downloadSpeed.value == 0) return "0";
   final remainBytes = task.totalLength.value - task.completedLength.value;
-  final remainTime = (remainBytes / task.downloadSpeed.value).toInt();
+  final remainTime = (remainBytes / task.downloadSpeed.value);
   if (remainTime < 60) {
-    return "$remainTime 秒";
+    return "${remainTime.toStringAsFixed(1)} 秒";
   } else if (remainTime < 60 * 60) {
-    return "${(remainTime / 60)} 分钟";
+    return "${(remainTime / 60).toStringAsFixed(1)} 分钟";
   } else {
-    return "${(remainTime / 60 / 60)} 小时";
+    return "${(remainTime / 60 / 60).toStringAsFixed(1)} 小时";
   }
 }

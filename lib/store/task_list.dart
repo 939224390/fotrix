@@ -24,6 +24,17 @@ class TaskList {
     });
   }
 
+  //初始化任务
+  Future<Task> createTask(dynamic status, TaskStatus taskStatus) async {
+    final task = await _initialTask(
+      status['files'][0]['uris'][0]['uri'],
+      status['gid'],
+      status['files'][0]['path'],
+      taskStatus,
+    );
+    return task;
+  }
+
   //创建任务
   Future<bool> addTask(String url) async {
     final list = [...active, ...complete, ...waiting];
@@ -34,12 +45,7 @@ class TaskList {
     //创建任务后加入等待队列
     final gid = await a2M.addTask(url);
     final status = await a2M.tellStatus(gid);
-    final task = await _initialTask(
-      status['files'][0]['uris'][0]['uri'],
-      gid,
-      status['files'][0]['path'],
-      TaskStatus.waiting,
-    );
+    final task = await createTask(status, TaskStatus.waiting);
 
     waiting.add(task);
 
@@ -92,20 +98,9 @@ class TaskList {
     task.completedLength.value = int.parse(status['completedLength'] ?? 0);
     task.totalLength.value = int.parse(status['totalLength'] ?? 0);
     task.downloadSpeed.value = double.parse(status['downloadSpeed'] ?? 0);
-    if (task.completedLength.value == task.totalLength.value) {
+    if (status['status'] == 'complete') {
       completeTask(task);
     }
-  }
-
-  //初始化任务
-  Future<Task> createTask(dynamic status, TaskStatus taskStatus) async {
-    final task = await _initialTask(
-      status['files'][0]['uris'][0]['uri'],
-      status['gid'],
-      status['files'][0]['path'],
-      taskStatus,
-    );
-    return task;
   }
 
   //监听任务状态
