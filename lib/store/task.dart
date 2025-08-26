@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:signals/signals.dart';
 
-enum TaskStatus { active, paused, complete, waiting, remove }
+enum TaskStatus { active, paused, complete, waiting, remove, error }
 
 class Task {
   final String gid;
@@ -35,6 +36,29 @@ class Task {
   late final speedTime = computed(
     () => '速度: ${formattedSpeed.value} - 剩余: ${remainTime.value}',
   );
+
+  late final taskIcon = computed(() {
+    IconData icon;
+    switch (status.value) {
+      case TaskStatus.active:
+        icon = Icons.file_download;
+        break;
+      case TaskStatus.waiting:
+        icon = Icons.stop;
+        break;
+      case TaskStatus.paused:
+        icon = Icons.stop;
+        break;
+      case TaskStatus.complete:
+        icon = Icons.download_done;
+        break;
+      case TaskStatus.error:
+        icon = Icons.priority_high;
+      case TaskStatus.remove:
+        icon = Icons.delete;
+    }
+    return Icon(icon);
+  });
   Task({
     required this.gid,
     required this.name,

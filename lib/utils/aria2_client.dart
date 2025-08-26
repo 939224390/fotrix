@@ -29,6 +29,18 @@ class Aria2Client {
     }
 
     await _startAria2();
+
+    bool isStartAria2 = false;
+    int retryCount = 0;
+    while (!isStartAria2) {
+      isStartAria2 = await _startAria2();
+      retryCount++;
+      if (retryCount > 5) {
+        logger.error("Aria2服务启动失败");
+        return;
+      }
+    }
+
     wsChannel = IOWebSocketChannel.connect(wsUrl);
     logger.info('aria2已启动');
   }
@@ -42,11 +54,9 @@ class Aria2Client {
           await taskList.checkActive(list);
           break;
         case "aria2.onDownloadComplete":
-        
           break;
       }
     });
-
   }
 
   Future<Result> send(String method, [List<dynamic>? params]) async {
@@ -112,7 +122,7 @@ class Aria2Client {
     }
   }
 
-  Future<void> _startAria2() async {
+  Future<bool> _startAria2() async {
     try {
       await Cross().createAria2();
 
@@ -128,8 +138,10 @@ class Aria2Client {
       aria2Process?.stdout.transform(utf8.decoder).listen((data) {
         data;
       });
+      return true;
     } catch (e) {
       logger.error("Aria2服务启动失败 $e");
+      return false;
     }
   }
 

@@ -47,27 +47,9 @@ class TaskItem extends StatelessWidget {
   }
 
   Widget _buildOpButton(Task task) {
-    IconData icon;
-    switch (task.status.value) {
-      case TaskStatus.active:
-        icon = Icons.file_download;
-        break;
-      case TaskStatus.waiting:
-        icon = Icons.stop;
-        break;
-      case TaskStatus.paused:
-        icon = Icons.stop;
-        break;
-      case TaskStatus.complete:
-        icon = Icons.download_done;
-        break;
-      case _:
-        icon = Icons.download_done;
-    }
-
     return IconButton(
       color: ColorTheme.textColor.value,
-      icon: Icon(icon),
+      icon: task.taskIcon.value,
       onPressed: () => taskLogic.sBtnLogic(task),
     );
   }

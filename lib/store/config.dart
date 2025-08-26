@@ -16,7 +16,7 @@ class Config {
   int maxDown = 5;
 
   late final _aria2Version = signal("");
-  String version = "0.1.2";
+  String version = "0.1.3";
 
   bool get darkMode => _darkMode.value;
   int get threadCount => _threadCount;
@@ -39,8 +39,6 @@ class Config {
   set aria2Version(String value) {
     _aria2Version.value = value;
   }
-
-
 
   //切换模式
   void changeTheme() {

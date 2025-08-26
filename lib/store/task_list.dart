@@ -100,6 +100,8 @@ class TaskList {
     task.downloadSpeed.value = double.parse(status['downloadSpeed'] ?? 0);
     if (status['status'] == 'complete') {
       completeTask(task);
+    } else if (status['status'] == 'error') {
+      task.status.value = TaskStatus.error;
     }
   }
 
@@ -110,7 +112,13 @@ class TaskList {
         case TaskStatus.active:
           updateTaskStatus(task);
           break;
+        case TaskStatus.paused:
+          time.cancel();
+          break;
         case TaskStatus.complete:
+          time.cancel();
+          break;
+        case TaskStatus.error:
           time.cancel();
           break;
         case _:
@@ -155,6 +163,12 @@ class TaskList {
     for (var task in copyPaused) {
       setTaskStatus(task, TaskStatus.waiting);
     }
+  }
+
+  //重试任务
+  void retryTask(Task task) async {
+    await a2M.removeTask(task.gid);
+    await a2M.addTask(task.url);
   }
 
   //任务完成
@@ -204,6 +218,9 @@ class TaskList {
         _active.value = remove(active, task);
         _waiting.value = remove(waiting, task);
         _complete.value = remove(complete, task);
+        break;
+      case TaskStatus.error:
+        task.status.value = TaskStatus.error;
         break;
     }
   }

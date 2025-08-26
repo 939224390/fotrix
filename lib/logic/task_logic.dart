@@ -19,6 +19,9 @@ class TaskLogic {
           "/select,${task.savePath.replaceAll("/", "\\")}",
         ]);
         break;
+      case TaskStatus.error:
+        taskList.retryTask(task);
+        break;
       case _:
         break;
     }
