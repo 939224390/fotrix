@@ -38,17 +38,22 @@ class TaskList {
   //创建任务
   Future<bool> addTask(String url) async {
     final list = [...active, ...complete, ...waiting];
-    if (list.any((element) => element.url == url)) {
+    bool isExist() {
+      return list.any((element) {
+        if (element.url == url && element.status.value != TaskStatus.error) {
+          return true;
+        } else {
+          return false;
+        }
+      });
+    }
+
+    if (isExist()) {
       return false;
     }
 
-    //创建任务后加入等待队列
-    final gid = await a2M.addTask(url);
-    final status = await a2M.tellStatus(gid);
-    final task = await createTask(status, TaskStatus.waiting);
-
-    waiting.add(task);
-
+    //向aria2提交下载任务，并检查等待队列
+    await a2M.addTask(url);
     await checkWaiting();
 
     return true;
@@ -167,8 +172,13 @@ class TaskList {
 
   //重试任务
   void retryTask(Task task) async {
-    await a2M.removeTask(task.gid);
-    await a2M.addTask(task.url);
+    await updateTaskStatus(task);
+    if (task.status.value != TaskStatus.complete) {
+      await a2M.removeTask(task.gid);
+    }
+    setTaskStatus(task, TaskStatus.remove);
+
+    await addTask(task.url);
   }
 
   //任务完成
@@ -186,8 +196,12 @@ class TaskList {
 
     await Future.delayed(Duration(seconds: 1));
 
-    if (await File(task.tmpPath).exists()) File(task.tmpPath).delete();
-    if (await File(task.savePath).exists()) File(task.savePath).delete();
+    if (await File(task.tmpPath).exists()) {
+      File(task.tmpPath).delete();
+    }
+    if (await File(task.savePath).exists()) {
+      File(task.savePath).delete();
+    }
   }
 
   void setTaskStatus(Task task, TaskStatus taskStatus) {
