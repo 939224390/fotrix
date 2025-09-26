@@ -30,19 +30,16 @@ class AppAction {
 
   static Future<void> getAria2Version() async {
     final res = await aria2Api.getAria2Version();
-    logger.info("aria2版本: $res");
     config.aria2Version = res;
   }
 
   static Future<void> tellActive() async {
     final res = await aria2Api.tellActive();
-    logger.info("tellActive: $res");
     taskList.checkActive(res);
   }
 
   static Future<void> tellWaiting() async {
     final res = await aria2Api.tellWaiting(0, 100);
-    logger.info("tellWaiting: $res");
     taskList.checkWaiting(res);
   }
 }

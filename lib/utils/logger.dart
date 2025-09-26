@@ -26,6 +26,15 @@ class Logger {
     );
   }
 
+  Future<void> debug(String msg) async {
+    String time = DateTime.now().toString();
+    await checkLog();
+    await logFile?.writeAsString(
+      "[$time] [DEBUG] $msg\n",
+      mode: FileMode.append,
+    );
+  }
+
   Future<void> error(String msg) async {
     String time = DateTime.now().toString();
     await checkLog();

@@ -11,13 +11,12 @@ import "package:fotrix/api/aria2_api.dart";
 class Config {
   final _darkMode = signal(true);
   bool _powerBoot = false;
-
   int _threadCount = 6;
   String savePath = "D:\\Download";
   int maxDown = 5;
 
   late final _aria2Version = signal("-1");
-  String version = "0.1.3";
+  String version = "0.0.1";
 
   bool get darkMode => _darkMode.value;
   int get threadCount => _threadCount;

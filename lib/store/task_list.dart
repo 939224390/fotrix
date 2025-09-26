@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:fotrix/utils/logger.dart';
 import 'package:signals/signals.dart';
 import 'task.dart';
 import "package:fotrix/api/aria2_api.dart";
@@ -29,23 +30,24 @@ class TaskList {
   //创建任务
   Future<bool> addTask(String url) async {
     final list = [...active, ...complete, ...waiting];
-    bool isExist() {
-      return list.any((element) {
-        if (element.url == url && element.status.value != TaskStatus.error) {
-          return true;
-        } else {
-          return false;
-        }
-      });
-    }
 
-    if (isExist()) {
+    bool isExist = list.any((element) {
+      if (element.url == url) {
+        if (element.status.value == TaskStatus.complete ||
+            element.status.value == TaskStatus.error) {
+          return false;
+        } else {
+          return true;
+        }
+      }
       return false;
-    }
+    });
 
     //向aria2提交下载任务，并检查等待队列
-    await aria2Api.addTask(url);
-
+    if (!isExist) {
+      final res = await aria2Api.addTask(url);
+      logger.debug("添加任务 $url 成功: $res");
+    }
     return true;
   }
 
@@ -96,7 +98,7 @@ class TaskList {
     if (status['status'] == 'complete') {
       completeTask(task);
     } else if (status['status'] == 'error') {
-      task.status.value = TaskStatus.error;
+      setTaskStatus(task, TaskStatus.error);
     }
   }
 
@@ -156,7 +158,8 @@ class TaskList {
 
   //重试任务
   void retryTask(Task task) async {
-    deleteTask(task);
+    await deleteTask(task);
+    await Future.delayed(Duration(milliseconds: 500));
     await addTask(task.url);
   }
 
@@ -166,14 +169,14 @@ class TaskList {
   }
 
   //删除任务
-  void deleteTask(Task task) async {
+  Future<void> deleteTask(Task task) async {
     await updateTaskStatus(task);
     if (task.status.value != TaskStatus.complete) {
       await aria2Api.removeTask(task.gid);
     }
     setTaskStatus(task, TaskStatus.remove);
 
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(Duration(milliseconds: 500));
 
     if (await File(task.tmpPath).exists()) {
       File(task.tmpPath).delete();
