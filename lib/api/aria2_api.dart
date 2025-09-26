@@ -1,43 +1,17 @@
-import 'dart:async';
-import 'package:fotrix/store/config.dart';
-import 'package:fotrix/store/logger.dart';
-import 'package:fotrix/store/task_list.dart';
+import 'package:fotrix/types/types.dart';
 import 'package:fotrix/utils/aria2_client.dart';
+import 'package:fotrix/utils/logger.dart';
 
-class Aria2Manager {
-  final a2c = Aria2Client();
-
-  //启动aria2服务
-  Future<void> start() async {
-    await a2c.start();
-    await getAria2Version();
-    await a2c.listen();
-    await taskList.start();
-  }
-
-  Future<void> updateConfig() async {
-    await a2c.send("aria2.changeGlobalOption", [
-      {
-        'dir': config.savePath,
-        'max-concurrent-downloads': config.maxDown,
-        'max-connection-per-server': config.threadCount,
-      },
-    ]);
-    await a2c.writeConf();
-  }
-
-  Future<void> shutdown() async {
-    await a2c.shutdown();
-  }
-
-  Future<void> getAria2Version() async {
-    final res = await a2c.send('aria2.getVersion');
-    if (res.code == -1) {
+class Aria2Api {
+  //获取aria2版本
+  Future<String> getAria2Version() async {
+    final res = await a2c.send("aria2.getVersion");
+    if (res.code == 1) {
+      return res.data['version'];
+    } else {
       logger.error("获取Aria2版本失败: ${res.data}");
-      config.aria2Version = "未连接";
-      return;
+      return "-1";
     }
-    config.aria2Version = res.data['version'];
   }
 
   //添加任务
@@ -48,8 +22,8 @@ class Aria2Manager {
     if (res.code == 1) {
       return res.data;
     } else {
-      logger.error(res.data);
-      return "";
+      logger.error("添加任务失败: ${res.data}");
+      return "-1";
     }
   }
 
@@ -140,6 +114,26 @@ class Aria2Manager {
       return "";
     }
   }
+
+  //更新aria2配置
+  Future<void> updateConfig(UConfig config) async {
+    await a2c.send("aria2.changeGlobalOption", [
+      {
+        'dir': config.savePath,
+        'max-concurrent-downloads': config.maxDown,
+        'max-connection-per-server': config.threadCount,
+      },
+    ]);
+  }
+
+  Future<void> shutdown() async {
+    final res = await a2c.send('aria2.shutdown');
+    if (res.code == 1 && res.data == 'OK') {
+      a2c.shutdown();
+    } else {
+      logger.error(res.data);
+    }
+  }
 }
 
-Aria2Manager a2M = Aria2Manager();
+final aria2Api = Aria2Api();

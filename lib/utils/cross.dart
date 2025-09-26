@@ -4,7 +4,7 @@ import 'package:fotrix/store/config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:process_run/shell.dart';
 
-import '../store/logger.dart';
+import 'logger.dart';
 
 class Cross {
   //获取配置路径
@@ -102,9 +102,9 @@ class Cross {
         // Windows 系统使用 tasklist 命令
         result = await Process.run("tasklist", [
           '/FI',
-          'IMAGENAME eq aria2c.exe',
+          'IMAGENAME eq fotrixaria2c.exe',
         ]);
-        return result.stdout.toString().contains('aria2c.exe');
+        return result.stdout.toString().contains('fotrixaria2c.exe');
       } else if (Platform.isLinux || Platform.isMacOS) {
         // Linux 和 macOS 系统使用 ps 命令
         result = await Process.run('ps', ['-A']);

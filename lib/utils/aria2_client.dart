@@ -1,90 +1,53 @@
 import "dart:async";
 import "dart:convert";
 import "dart:io";
-import "package:fotrix/store/logger.dart";
-import "package:fotrix/store/result.dart";
-import "package:fotrix/store/task_list.dart";
+import "package:fotrix/utils/logger.dart";
+import "package:fotrix/types/types.dart";
 import "package:fotrix/utils/cross.dart";
 import "package:fotrix/store/config.dart";
-import 'package:dio/dio.dart';
 import "package:web_socket_channel/io.dart";
+import "package:json_rpc_2/json_rpc_2.dart";
 
 class Aria2Client {
-  final String httpUrl = "http://localhost:16800/jsonrpc";
   final String wsUrl = "ws://localhost:16800/jsonrpc";
-  final Duration timeout = Duration(seconds: 10);
-  final Dio dio = Dio();
   IOWebSocketChannel? wsChannel;
+  Client? client;
   Process? aria2Process;
 
-  Future<void> start() async {
-    final isRunning = await Cross().isAria2Running();
-    if (isRunning) {
-      final v = await send('aria2.getVersion');
-      if (v.code == 1) {
-        wsChannel = IOWebSocketChannel.connect(wsUrl);
-        logger.info('aria2已启动');
-        return;
-      }
-    }
-
-    await _startAria2();
-
-    bool isStartAria2 = false;
-    int retryCount = 0;
-    while (!isStartAria2) {
-      isStartAria2 = await _startAria2();
-      retryCount++;
-      if (retryCount > 5) {
-        logger.error("Aria2服务启动失败");
-        return;
-      }
-    }
-
+  void connect() {
     wsChannel = IOWebSocketChannel.connect(wsUrl);
-    logger.info('aria2已启动');
+    client = Client(wsChannel!.cast<String>());
+    unawaited(client?.listen());
   }
 
-  Future<void> listen() async {
-    wsChannel!.stream.listen((data) async {
-      final res = jsonDecode(data);
-      switch (res['method']) {
-        case 'aria2.onDownloadStart':
-          final list = res['params'];
-          await taskList.checkActive(list);
-          break;
-        case "aria2.onDownloadComplete":
-          break;
-      }
-    });
-  }
-
-  Future<Result> send(String method, [List<dynamic>? params]) async {
+  Future<void> start() async {
     try {
-      final response = await dio
-          .post(
-            httpUrl,
-            options: Options(headers: {'Content-Type': 'application/json'}),
-            data: json.encode({
-              'jsonrpc': '2.0',
-              'method': method,
-              'params': params ?? [],
-              'id': DateTime.now().millisecondsSinceEpoch,
-            }),
-          )
-          .timeout(timeout);
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.data);
-        if (data['error'] != null) {
-          return Result(-1, "Aria2请求错误: ${data['error']}");
-        }
-        return Result(1, data['result']);
-      } else {
-        return Result(-1, "HTTP error: ${response.statusCode}");
+      final isRunning = await Cross().isAria2Running();
+      logger.info("正在启动Aria2服务...");
+      if (!isRunning) {
+        await _startAria2();
       }
+      logger.info('aria2已启动');
+      connect();
+      logger.info("已连接Aria2服务");
     } catch (e) {
-      return Result(-1, "请求失败: $e");
+      logger.info("正在启动Aria2服务...");
+      await _startAria2();
+      logger.info('aria2已启动');
+      connect();
+      logger.info("已连接Aria2服务");
+    }
+  }
+
+  Future<Response> send(String method, [List<dynamic>? params]) async {
+    try {
+      final response = await client?.sendRequest(method, params);
+      if (response == null) {
+        return Response(-1, "请求失败");
+      }
+      return Response(1, response);
+    } catch (e) {
+      return Response(-1, "请求失败:$e");
     }
   }
 
@@ -145,8 +108,9 @@ class Aria2Client {
     }
   }
 
-  Future<void> shutdown() async {
-    await send("aria2.shutdonw");
+  void shutdown() {
     aria2Process?.kill();
   }
 }
+
+final a2c = Aria2Client();

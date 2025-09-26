@@ -1,11 +1,12 @@
 import 'dart:io';
-import 'package:fotrix/store/aria2_manager.dart';
-import 'package:fotrix/store/logger.dart';
+import 'package:fotrix/utils/logger.dart';
+import 'package:fotrix/types/types.dart';
 import 'package:fotrix/utils/cross.dart';
 import 'dart:convert';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:signals/signals.dart';
+import "package:fotrix/api/aria2_api.dart";
 
 class Config {
   final _darkMode = signal(true);
@@ -15,7 +16,7 @@ class Config {
   String savePath = "D:\\Download";
   int maxDown = 5;
 
-  late final _aria2Version = signal("");
+  late final _aria2Version = signal("-1");
   String version = "0.1.3";
 
   bool get darkMode => _darkMode.value;
@@ -85,7 +86,10 @@ class Config {
           'maxDown': maxDown,
         }),
       );
-      await a2M.updateConfig();
+
+      await aria2Api.updateConfig(
+        UConfig(savePath: savePath, threadCount: threadCount, maxDown: maxDown),
+      );
     } catch (e) {
       await logger.error("保存配置文件失败 $e");
     }
