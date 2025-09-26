@@ -5,6 +5,7 @@ import 'package:fotrix/store/config.dart';
 import 'package:fotrix/store/task_list.dart';
 import 'package:fotrix/utils/aria2_client.dart';
 import 'package:fotrix/utils/logger.dart';
+import 'package:fotrix/utils/tray_service.dart';
 
 class AppAction {
   static Future<void> init() async {
@@ -35,6 +36,11 @@ class AppAction {
 
   static Future<void> tellActive() async {
     final res = await aria2Api.tellActive();
+    if (res.isEmpty) {
+      ts.changeTrayIcon("default");
+    } else {
+      ts.changeTrayIcon("active");
+    }
     taskList.checkActive(res);
   }
 

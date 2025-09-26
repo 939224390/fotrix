@@ -71,7 +71,7 @@ class Aria2Client {
       confContent.write("save-session-interval=60\n");
       confContent.write("max-concurrent-downloads=${config.maxDown}\n");
       confContent.write("max-connection-per-server=${config.threadCount}\n");
-      confContent.write("log=$aria2LogPath\n");
+      //confContent.write("log=$aria2LogPath\n");
       confContent.write("dir=${config.savePath}\n");
       if (!await aria2Conf.exists()) {
         await aria2Conf.create();

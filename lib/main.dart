@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/action.dart';
 import 'package:fotrix/store/config.dart';
-import 'package:fotrix/store/tray_service.dart';
+import 'package:fotrix/utils/tray_service.dart';
 import 'package:fotrix/home_page.dart';
 import 'package:window_manager/window_manager.dart';
 

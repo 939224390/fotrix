@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/store/tray_service.dart';
+import 'package:fotrix/utils/tray_service.dart';
 import 'package:window_manager/window_manager.dart';
 
 class WindowControl extends StatefulWidget {

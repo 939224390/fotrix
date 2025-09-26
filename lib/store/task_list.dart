@@ -45,8 +45,7 @@ class TaskList {
 
     //向aria2提交下载任务，并检查等待队列
     if (!isExist) {
-      final res = await aria2Api.addTask(url);
-      logger.debug("添加任务 $url 成功: $res");
+      await aria2Api.addTask(url);
     }
     return true;
   }
@@ -217,6 +216,8 @@ class TaskList {
         break;
       case TaskStatus.error:
         task.status.value = TaskStatus.error;
+        _active.value = remove(active, task);
+        _waiting.value = add(waiting, task);
         break;
     }
   }
