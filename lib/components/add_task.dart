@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/store/task_list.dart';
-import 'package:fotrix/utils/color_mode.dart';
 import 'package:fotrix/utils/common.dart';
+import 'package:fotrix/utils/theme.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
@@ -39,8 +39,8 @@ class _AddTaskState extends State<AddTask> {
 
   Widget _buildAddTaskDialog(List<Widget> children) {
     return SimpleDialog(
-      backgroundColor: ColorTheme.cardColor.value,
-      title: buildText("新建下载任务"),
+      backgroundColor: Theme.of(context).fTheme.card,
+      title: buildText("新建下载任务", context),
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -65,7 +65,7 @@ class _AddTaskState extends State<AddTask> {
   Widget _buildStartBtn() {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        backgroundColor: ColorTheme.buttonColor.value,
+        backgroundColor: Theme.of(context).fTheme.btn,
       ),
       onPressed: _createDownloadTask,
       child: Text("开始下载"),

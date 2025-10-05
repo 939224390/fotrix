@@ -42,7 +42,7 @@ dependencies:
     launch_at_startup: ^0.5.1
     process_run: ^1.2.4
     signals: ^6.0.2
-    package_info_plus: ^8.3.0
+    package_info_plus: ^9.0.0
     stream_channel: ^2.1.4
     web_socket_channel: ^3.0.3
     json_rpc_2: ^4.0.0

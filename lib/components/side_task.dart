@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/task_list.dart';
-import 'package:fotrix/utils/color_mode.dart';
 import 'package:fotrix/utils/common.dart';
+import 'package:fotrix/utils/theme.dart';
 import 'package:signals/signals_flutter.dart';
 
 class SideTask extends StatelessWidget {
@@ -26,13 +26,18 @@ class SideTask extends StatelessWidget {
         itemBuilder: (sideItem) {
           return [
             //侧边标题
-            _buildSideTitle(sideItem.title),
+            _buildSideTitle(sideItem.title, context),
             SizedBox(height: 30),
             //侧边子列表
             _buildSideSubList(
               sideItem,
               subItemBuilder: (subIdex, index) {
-                return _buildSideButton(subIdex, () => onTap(subIdex), index);
+                return _buildSideButton(
+                  subIdex,
+                  () => onTap(subIdex),
+                  index,
+                  context,
+                );
               },
             ),
           ];
@@ -47,10 +52,10 @@ class SideTask extends StatelessWidget {
     return Column(children: itemBuilder(data.sideItem[0]));
   }
 
-  Widget _buildSideTitle(String text) {
+  Widget _buildSideTitle(String text, BuildContext ctx) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: buildLText(text),
+      child: buildLText(text, ctx),
     );
   }
 
@@ -65,14 +70,19 @@ class SideTask extends StatelessWidget {
     );
   }
 
-  Widget _buildSideButton(SideSubItemInfo item, Function func, int index) {
+  Widget _buildSideButton(
+    SideSubItemInfo item,
+    Function func,
+    int index,
+    BuildContext ctx,
+  ) {
     return Watch(
       (_) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: ElevatedButton(
           onPressed: func as void Function()?,
           style: ElevatedButton.styleFrom(
-            backgroundColor: colorMode.activeColor(index).value,
+            backgroundColor: _getButtonColor(ctx, index),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -81,14 +91,19 @@ class SideTask extends StatelessWidget {
           ),
           child: Row(
             children: [
-              buildIcon(item.icon),
-              buildText(item.title),
+              buildIcon(item.icon, ctx),
+              buildText(item.title, ctx),
               SizedBox(width: 5),
-              buildText(listLen.value[index].toString()),
+              buildText(listLen.value[index].toString(), ctx),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Color _getButtonColor(BuildContext context, int index) {
+    final theme = Theme.of(context).fTheme;
+    return pInf.mInd == index ? theme.tabActive : theme.tabDefault;
   }
 }

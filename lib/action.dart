@@ -36,16 +36,21 @@ class AppAction {
 
   static Future<void> tellActive() async {
     final res = await aria2Api.tellActive();
-    if (res.isEmpty) {
-      ts.changeTrayIcon("default");
-    } else {
-      ts.changeTrayIcon("active");
-    }
     taskList.checkActive(res);
+    if (res.isEmpty) {
+      if (ts.status == "active") {
+        ts.changeTrayIcon("default");
+      }
+    } else {
+      if (ts.status == "default") {
+        ts.changeTrayIcon("active");
+      }
+    }
   }
 
   static Future<void> tellWaiting() async {
     final res = await aria2Api.tellWaiting(0, 100);
     taskList.checkWaiting(res);
   }
+
 }

@@ -54,7 +54,7 @@ class Aria2Client {
   Future<void> writeConf() async {
     try {
       final aria2ConfPath = await Cross().getAria2ConfPath();
-      final aria2LogPath = await Cross().getAria2LogPath();
+      //   final aria2LogPath = await Cross().getAria2LogPath();
       final aria2Conf = File(aria2ConfPath);
 
       final confContent = StringBuffer();

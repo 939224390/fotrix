@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/action.dart';
 import 'package:fotrix/store/config.dart';
+import 'package:fotrix/utils/theme.dart';
 import 'package:fotrix/utils/tray_service.dart';
 import 'package:fotrix/home_page.dart';
+import 'package:signals/signals_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
 void main() async {
@@ -56,18 +58,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'HarmonyOS Sans',
-        textTheme: TextTheme(
-          bodyMedium: TextStyle(fontWeight: FontWeight.normal),
-          titleMedium: TextStyle(fontWeight: FontWeight.w500),
-        ),
-        brightness: config.darkMode ? Brightness.dark : Brightness.light,
-      ),
-
-      debugShowCheckedModeBanner: false,
-      home: const HomePage(),
-    );
+    return Watch((context) {
+      return MaterialApp(
+        theme: ThemeManager.lightTheme,
+        darkTheme: ThemeManager.darkTheme,
+        themeMode: config.darkMode ? ThemeMode.dark : ThemeMode.light,
+        debugShowCheckedModeBanner: false,
+        home: const HomePage(),
+      );
+    });
   }
 }

@@ -1,8 +1,8 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:fotrix/utils/color_mode.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/store/config.dart';
+import 'package:fotrix/utils/theme.dart';
 
 class MainSetting extends StatefulWidget {
   const MainSetting({super.key});
@@ -35,7 +35,7 @@ class _MainSettingState extends State<MainSetting> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        buildMainTitle("设置"),
+        buildMainTitle("设置", context),
         buildDivider(),
         _buildSettingList([
           _buildPowerBootSwitch(),
@@ -57,7 +57,10 @@ class _MainSettingState extends State<MainSetting> {
   }
 
   Widget _buildSec(String text) {
-    return Padding(padding: const EdgeInsets.all(12), child: buildText(text));
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: buildText(text, context),
+    );
   }
 
   Widget _buildPowerBootSwitch() {
@@ -65,7 +68,7 @@ class _MainSettingState extends State<MainSetting> {
       children: [
         _buildSec("开机自启"),
         Switch(
-          inactiveTrackColor: ColorTheme.switchColor.value,
+          inactiveTrackColor: Theme.of(context).fTheme.sswitch,
           value: pb,
           onChanged: (v) {
             setState(() {
@@ -86,7 +89,7 @@ class _MainSettingState extends State<MainSetting> {
             controller: _mDCtrler,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(border: InputBorder.none),
-            style: TextStyle(color: ColorTheme.textColor.value),
+            style: TextStyle(color: Theme.of(context).fTheme.text),
           ),
         ),
       ],
@@ -102,7 +105,7 @@ class _MainSettingState extends State<MainSetting> {
             controller: _thCtrler,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(border: InputBorder.none),
-            style: TextStyle(color: ColorTheme.textColor.value),
+            style: TextStyle(color: Theme.of(context).fTheme.text),
           ),
         ),
       ],
@@ -114,7 +117,11 @@ class _MainSettingState extends State<MainSetting> {
       children: [
         _buildSec("保存路径"),
         Expanded(
-          child: buildSavePathBtn(_selectDirectory, buildText(_tmpPath)),
+          child: buildSavePathBtn(
+            _selectDirectory,
+            buildText(_tmpPath, context),
+            context,
+          ),
         ),
       ],
     );
@@ -135,7 +142,7 @@ class _MainSettingState extends State<MainSetting> {
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: ColorTheme.buttonColor.value,
+          backgroundColor: Theme.of(context).fTheme.btn,
         ),
         onPressed: () {
           config.threadCount = int.parse(_thCtrler.text);
@@ -160,7 +167,7 @@ class _MainSettingState extends State<MainSetting> {
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: ColorTheme.buttonColor.value,
+          backgroundColor: Theme.of(context).fTheme.btn,
         ),
         onPressed: () {
           setState(() {

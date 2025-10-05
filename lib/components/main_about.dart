@@ -1,7 +1,7 @@
 import "package:flutter/material.dart";
-import "package:fotrix/utils/color_mode.dart";
 import "package:fotrix/utils/common.dart";
 import "package:fotrix/store/config.dart";
+import "package:fotrix/utils/theme.dart";
 import "package:signals/signals_flutter.dart";
 
 class MainAbout extends StatefulWidget {
@@ -19,10 +19,10 @@ class _MainAboutState extends State<MainAbout> {
       children: [
         Column(
           children: [
-            buildMainTitle("关于"),
+            buildMainTitle("关于", context),
             buildDivider(),
-            _buildXLText("fotrix"),
-            buildText("Fotrix 是一个基于 Flutter 开发的aria2下载工具"),
+            _buildXLText("fotrix", context),
+            buildText("Fotrix 是一个基于 Flutter 开发的aria2下载工具", context),
           ],
         ),
         Watch(
@@ -30,8 +30,8 @@ class _MainAboutState extends State<MainAbout> {
             padding: const EdgeInsets.only(bottom: 15),
             child: Column(
               children: [
-                buildText("aria2: ${config.aria2Version}"),
-                buildText("v${config.version}"),
+                buildText("aria2: ${config.aria2Version}", context),
+                buildText("v${config.version}", context),
               ],
             ),
           ),
@@ -40,11 +40,11 @@ class _MainAboutState extends State<MainAbout> {
     );
   }
 
-  Widget _buildXLText(String text) {
+  Widget _buildXLText(String text, BuildContext ctx) {
     return Text(
       text,
       style: TextStyle(
-        color: ColorTheme.textColor.value,
+        color: Theme.of(ctx).fTheme.text,
         fontSize: 30,
         fontWeight: FontWeight.bold,
       ),

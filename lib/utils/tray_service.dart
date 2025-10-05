@@ -15,6 +15,7 @@ class TrayService {
       Platform.isWindows
           ? "assets/images/active.ico"
           : "assets/images/active.png";
+  String status = "default";
 
   final menu = Menu(
     items: [
@@ -58,9 +59,11 @@ class TrayService {
     switch (status) {
       case "active":
         _tm.setIcon(iconActive);
+        this.status = "active";
         break;
       case "default":
         _tm.setIcon(iconDefault);
+        this.status = "default";
         break;
     }
   }

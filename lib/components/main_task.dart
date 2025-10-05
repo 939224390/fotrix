@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/utils/color_mode.dart';
 import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/components/task_item.dart';
 import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/task_list.dart';
+import 'package:fotrix/utils/theme.dart';
 import 'package:signals/signals_flutter.dart';
 
 class MainTask extends StatelessWidget {
@@ -26,8 +26,8 @@ class MainTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _buildMain([
-      buildMainTitle(title.watch(context)),
-      _buildBtn(),
+      buildMainTitle(title.watch(context), context),
+      _buildBtn(context),
     ], _buildList());
   }
 
@@ -47,18 +47,18 @@ class MainTask extends StatelessWidget {
     );
   }
 
-  Widget _buildBtn() {
+  Widget _buildBtn(BuildContext context) {
     return Row(
       children: [
         IconButton(
           onPressed: () => {},
           icon: Icon(Icons.play_arrow),
-          color: ColorTheme.textColor.value,
+          color: Theme.of(context).fTheme.text,
         ),
         IconButton(
           onPressed: () => {},
           icon: Icon(Icons.pause),
-          color: ColorTheme.textColor.value,
+          color: Theme.of(context).fTheme.text,
         ),
       ],
     );

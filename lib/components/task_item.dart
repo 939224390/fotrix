@@ -1,8 +1,8 @@
 import "package:flutter/material.dart";
 import "package:fotrix/logic/task_logic.dart";
-import "package:fotrix/utils/color_mode.dart";
 import "package:fotrix/utils/common.dart";
 import "package:fotrix/store/task.dart";
+import "package:fotrix/utils/theme.dart";
 import "package:signals/signals_flutter.dart";
 
 class TaskItem extends StatelessWidget {
@@ -15,19 +15,20 @@ class TaskItem extends StatelessWidget {
     return Watch(
       (_) => _buildTaskItem(
         _buildItemDetail(
-          _buildOpButton(task),
-          _buildTaskTitle(),
-          _buildSizePart(task),
-          _buildDeleteButton(),
+          _buildOpButton(task, context),
+          _buildTaskTitle(context),
+          _buildSizePart(task, context),
+          _buildDeleteButton(context),
         ),
+        context,
       ),
     );
   }
 
-  Widget _buildTaskItem(Widget child) {
+  Widget _buildTaskItem(Widget child, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Card(color: ColorTheme.cardColor.value, child: child),
+      child: Card(color: Theme.of(context).fTheme.card, child: child),
     );
   }
 
@@ -46,34 +47,34 @@ class TaskItem extends StatelessWidget {
     );
   }
 
-  Widget _buildOpButton(Task task) {
+  Widget _buildOpButton(Task task, BuildContext context) {
     return IconButton(
-      color: ColorTheme.textColor.value,
+      color: Theme.of(context).fTheme.text,
       icon: task.taskIcon.value,
       onPressed: () => taskLogic.sBtnLogic(task),
     );
   }
 
-  Widget _buildTaskTitle() {
+  Widget _buildTaskTitle(BuildContext ctx) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: buildText(task.name)),
-        buildText(task.progress.value),
+        Expanded(child: buildText(task.name, ctx)),
+        buildText(task.progress.value, ctx),
       ],
     );
   }
 
-  Widget _buildSizePart(Task task) {
+  Widget _buildSizePart(Task task, BuildContext ctx) {
     if (task.status.value == TaskStatus.active) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildText(task.sizeRate.value),
+          buildText(task.sizeRate.value, ctx),
           Expanded(
             child: Align(
               alignment: Alignment.centerRight,
-              child: buildText(task.speedTime.value),
+              child: buildText(task.speedTime.value, ctx),
             ),
           ),
         ],
@@ -81,14 +82,14 @@ class TaskItem extends StatelessWidget {
     } else {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [buildText(task.sizeRate.value)],
+        children: [buildText(task.sizeRate.value, ctx)],
       );
     }
   }
 
-  Widget _buildDeleteButton() {
+  Widget _buildDeleteButton(BuildContext context) {
     return IconButton(
-      color: ColorTheme.textColor.value,
+      color: Theme.of(context).fTheme.text,
       onPressed: () => taskLogic.delBtn(task),
       icon: Icon(Icons.delete),
     );

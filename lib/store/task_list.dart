@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:fotrix/utils/logger.dart';
 import 'package:signals/signals.dart';
 import 'task.dart';
 import "package:fotrix/api/aria2_api.dart";
@@ -113,12 +112,6 @@ class TaskList {
           break;
       }
     });
-  }
-
-  //获取任务列表任务数量
-  List<int> getTaskNum() {
-    final list = [active.length, waiting.length, complete.length];
-    return list;
   }
 
   // 暂停任务
