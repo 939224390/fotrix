@@ -39,7 +39,7 @@ class _AddTaskState extends State<AddTask> {
 
   Widget _buildAddTaskDialog(List<Widget> children) {
     return SimpleDialog(
-      backgroundColor: Theme.of(context).fTheme.card,
+      backgroundColor: context.cardColor,
       title: buildText("新建下载任务", context),
       children: [
         Padding(
@@ -64,9 +64,7 @@ class _AddTaskState extends State<AddTask> {
 
   Widget _buildStartBtn() {
     return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Theme.of(context).fTheme.btn,
-      ),
+      style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
       onPressed: _createDownloadTask,
       child: Text("开始下载"),
     );

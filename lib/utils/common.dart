@@ -7,21 +7,18 @@ Widget buildText(String text, BuildContext ctx) {
     text,
     maxLines: 1,
     overflow: TextOverflow.ellipsis,
-    style: TextStyle(color: Theme.of(ctx).fTheme.text),
+    style: TextStyle(color: ctx.textColor),
   );
 }
 
 //大号字体
 Widget buildLText(String text, BuildContext ctx) {
-  return Text(
-    text,
-    style: TextStyle(color: Theme.of(ctx).fTheme.text, fontSize: 20),
-  );
+  return Text(text, style: TextStyle(color: ctx.textColor, fontSize: 20));
 }
 
 //默认图标
 Widget buildIcon(IconData icon, BuildContext ctx) {
-  return Icon(icon, color: Theme.of(ctx).fTheme.text);
+  return Icon(icon, color: ctx.textColor);
 }
 
 //默认分隔线
@@ -47,7 +44,7 @@ Widget buildSavePathBtn(
 ) {
   return ElevatedButton(
     style: ElevatedButton.styleFrom(
-      backgroundColor: Theme.of(ctx).fTheme.btn,
+      backgroundColor: ctx.buttonColor,
       elevation: 0,
       side: BorderSide.none,
     ),

@@ -44,7 +44,7 @@ class _MainAboutState extends State<MainAbout> {
     return Text(
       text,
       style: TextStyle(
-        color: Theme.of(ctx).fTheme.text,
+        color: ctx.textColor,
         fontSize: 30,
         fontWeight: FontWeight.bold,
       ),

@@ -11,7 +11,7 @@ class MainTask extends StatelessWidget {
   final PageInfo data;
 
   late final title = computed(
-    () => data.sideItem[pInf.pInd].subItems[pInf.mInd].title,
+    () => data.tabs[pInf.pInd].tabItems[pInf.mInd].title,
   );
 
   late final currList = computed(
@@ -53,12 +53,12 @@ class MainTask extends StatelessWidget {
         IconButton(
           onPressed: () => {},
           icon: Icon(Icons.play_arrow),
-          color: Theme.of(context).fTheme.text,
+          color: context.textColor,
         ),
         IconButton(
           onPressed: () => {},
           icon: Icon(Icons.pause),
-          color: Theme.of(context).fTheme.text,
+          color: context.textColor,
         ),
       ],
     );

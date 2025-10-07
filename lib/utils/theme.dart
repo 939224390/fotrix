@@ -8,7 +8,7 @@ class FotrixThemeData {
   final Color main;
   final Color text;
   final Color card;
-  final Color btn;
+  final Color button;
   final Color sswitch;
   final Color tabDefault;
   final Color tabActive;
@@ -19,7 +19,7 @@ class FotrixThemeData {
     required this.main,
     required this.text,
     required this.card,
-    required this.btn,
+    required this.button,
     required this.sswitch,
     required this.tabDefault,
     required this.tabActive,
@@ -35,7 +35,7 @@ extension FotrixTheme on ThemeData {
         main: Color(0xFFF8F8F8),
         text: Color(0xFF000000),
         card: Color(0xFFFFFFFF),
-        btn: Color(0xFFFFFFFF),
+        button: Color(0xFFE9E1F5),
         sswitch: Color(0xFFF8F8F8),
         tabDefault: Color(0xFFF4F5F7),
         tabActive: Color(0xFFCCCCCC),
@@ -47,13 +47,28 @@ extension FotrixTheme on ThemeData {
         main: Color(0xFF343434),
         text: Color(0xFFFFFFFF),
         card: Color(0xFF2D2D2D),
-        btn: Color(0xFF606060),
+        button: Color(0xFF606060),
         sswitch: Color(0xFF343434),
         tabDefault: Color(0xFF2D2D2D),
         tabActive: Color(0xFF444444),
       );
     }
   }
+}
+
+extension ThemeExtension on BuildContext {
+  ThemeData get theme => Theme.of(this);
+  FotrixThemeData get fTheme => Theme.of(this).fTheme;
+
+  Color get navColor => fTheme.nav;
+  Color get sideColor => fTheme.side;
+  Color get mainColor => fTheme.main;
+  Color get cardColor => fTheme.card;
+  Color get textColor => fTheme.text;
+  Color get buttonColor => fTheme.button;
+  Color get switchColor => fTheme.sswitch;
+  Color get tabDefaultColor => fTheme.tabDefault;
+  Color get tabActiveColor => fTheme.tabActive;
 }
 
 class ThemeManager {

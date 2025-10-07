@@ -20,64 +20,52 @@ class PageInfo {
   }
 
   // 导航栏图标
-  late List<NavBarItemInfo> navBarTopItem;
+  late List<NavItem> navTop;
+  late List<NavItem> navBtm;
 
-  late Computed<List<NavBarItemInfo>> navBarBottomItem;
-  late List<NavBarItemInfo> navBarBottomItemDark;
-  late List<NavBarItemInfo> navBarBottomItemmLight;
-  late List<SideItemInfo> sideItem;
+  late List<TabsItem> tabs;
 
   PageInfo() {
     //导航栏上部选项
-    navBarTopItem = [
-      NavBarItemInfo(Icons.home, NavBarItemStatus.home),
-      NavBarItemInfo(Icons.menu, NavBarItemStatus.list),
-      NavBarItemInfo(Icons.add, NavBarItemStatus.add),
+    navTop = [
+      NavItem(Icons.home, NavStatus.home),
+      NavItem(Icons.menu, NavStatus.list),
+      NavItem(Icons.add, NavStatus.add),
     ];
     //导航栏下部选项
-    navBarBottomItemDark = [
-      NavBarItemInfo(Icons.light_mode, NavBarItemStatus.darkMode),
-      NavBarItemInfo(Icons.settings, NavBarItemStatus.settings),
+    navBtm = [
+      NavItem(
+        computed(
+          () => config.darkMode ? Icons.dark_mode : Icons.light_mode,
+        ).value,
+        NavStatus.darkMode,
+      ),
+      NavItem(Icons.settings, NavStatus.settings),
     ];
-    navBarBottomItemmLight = [
-      NavBarItemInfo(Icons.dark_mode, NavBarItemStatus.darkMode),
-      NavBarItemInfo(Icons.settings, NavBarItemStatus.settings),
-    ];
-    navBarBottomItem = computed(
-      () => config.darkMode ? navBarBottomItemDark : navBarBottomItemmLight,
-    );
     //侧边栏选项
-    sideItem = [
-      SideItemInfo("任务列表", [
-        SideSubItemInfo(
+    tabs = [
+      TabsItem("任务列表", [
+        TabItem(
           icon: Icons.play_arrow,
           title: "下载中",
-          tag: SideSubItemStatus.active,
+          tag: TabStatus.active,
           isSelect: true,
         ),
-        SideSubItemInfo(
-          icon: Icons.stop,
-          title: "等待中",
-          tag: SideSubItemStatus.waiting,
-        ),
-        SideSubItemInfo(
+        TabItem(icon: Icons.stop, title: "等待中", tag: TabStatus.waiting),
+        TabItem(
           icon: Icons.download_done,
           title: "已完成",
-          tag: SideSubItemStatus.complete,
+          tag: TabStatus.complete,
         ),
       ]),
-      SideItemInfo("设置", [
-        SideSubItemInfo(
+      TabsItem("设置", [
+        TabItem(
           icon: Icons.settings,
           title: "设置",
-          tag: SideSubItemStatus.setting,
+          tag: TabStatus.setting,
           isSelect: true,
         ),
-        SideSubItemInfo(
-          icon: Icons.report,
-          title: "关于",
-          tag: SideSubItemStatus.about,
-        ),
+        TabItem(icon: Icons.report, title: "关于", tag: TabStatus.about),
       ]),
     ];
   }
@@ -85,13 +73,13 @@ class PageInfo {
 
 PageInfo pInf = PageInfo();
 
-class NavBarItemInfo {
+class NavItem {
   IconData icon;
   String? tag;
-  NavBarItemInfo(this.icon, this.tag);
+  NavItem(this.icon, this.tag);
 }
 
-class NavBarItemStatus {
+class NavStatus {
   static const String home = "home";
   static const String list = "list";
   static const String add = "add";
@@ -99,18 +87,20 @@ class NavBarItemStatus {
   static const String settings = "settings";
 }
 
-class SideItemInfo {
+//选项卡组
+class TabsItem {
   String title;
-  List<SideSubItemInfo> subItems;
-  SideItemInfo(this.title, this.subItems);
+  List<TabItem> tabItems;
+  TabsItem(this.title, this.tabItems);
 }
 
-class SideSubItemInfo {
+//选项卡
+class TabItem {
   IconData icon;
   String title;
   String tag;
   bool isSelect;
-  SideSubItemInfo({
+  TabItem({
     required this.icon,
     required this.title,
     required this.tag,
@@ -118,7 +108,7 @@ class SideSubItemInfo {
   });
 }
 
-class SideSubItemStatus {
+class TabStatus {
   static const String active = "active";
   static const String waiting = "waiting";
   static const String complete = "complete";

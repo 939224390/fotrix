@@ -20,59 +20,59 @@ class PageLogic {
   }
 
   //导航栏逻辑
-  void navLogic(NavBarItemInfo item) {
+  void navLogic(NavItem item) {
     switch (item.tag) {
-      case NavBarItemStatus.home:
+      case NavStatus.home:
         changePage(0);
-        changeActive(SideSubItemStatus.active);
+        changeActive(TabStatus.active);
         break;
-      case NavBarItemStatus.list:
+      case NavStatus.list:
         changePage(0);
-        changeActive(SideSubItemStatus.active);
+        changeActive(TabStatus.active);
         break;
-      case NavBarItemStatus.add:
+      case NavStatus.add:
         showDialog(context: context, builder: (context) => AddTask());
         break;
-      case NavBarItemStatus.darkMode:
+      case NavStatus.darkMode:
         config.changeTheme();
         break;
-      case NavBarItemStatus.settings:
-        changeActive(SideSubItemStatus.setting);
+      case NavStatus.settings:
+        changeActive(TabStatus.setting);
         changePage(1);
         break;
     }
   }
 
   //侧边栏逻辑
-  void sideLogic(SideSubItemInfo item) {
+  void tabLogic(TabItem item) {
     switch (item.tag) {
-      case SideSubItemStatus.active:
+      case TabStatus.active:
         changeMain(0);
-        changeActive(SideSubItemStatus.active);
+        changeActive(TabStatus.active);
         break;
-      case SideSubItemStatus.waiting:
+      case TabStatus.waiting:
         changeMain(1);
-        changeActive(SideSubItemStatus.waiting);
+        changeActive(TabStatus.waiting);
         break;
-      case SideSubItemStatus.complete:
+      case TabStatus.complete:
         changeMain(2);
-        changeActive(SideSubItemStatus.complete);
+        changeActive(TabStatus.complete);
         break;
-      case SideSubItemStatus.setting:
+      case TabStatus.setting:
         changeMain(0);
-        changeActive(SideSubItemStatus.setting);
+        changeActive(TabStatus.setting);
         break;
-      case SideSubItemStatus.about:
+      case TabStatus.about:
         changeMain(1);
-        changeActive(SideSubItemStatus.about);
+        changeActive(TabStatus.about);
         break;
     }
   }
 
   //切换活动页
   void changeActive(String status) {
-    for (var i in pInf.sideItem) {
-      for (var j in i.subItems) {
+    for (var i in pInf.tabs) {
+      for (var j in i.tabItems) {
         if (j.tag != status) {
           j.isSelect = false;
         } else {

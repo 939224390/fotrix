@@ -68,7 +68,7 @@ class _MainSettingState extends State<MainSetting> {
       children: [
         _buildSec("开机自启"),
         Switch(
-          inactiveTrackColor: Theme.of(context).fTheme.sswitch,
+          inactiveTrackColor: context.switchColor,
           value: pb,
           onChanged: (v) {
             setState(() {
@@ -89,7 +89,7 @@ class _MainSettingState extends State<MainSetting> {
             controller: _mDCtrler,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(border: InputBorder.none),
-            style: TextStyle(color: Theme.of(context).fTheme.text),
+            style: TextStyle(color: context.textColor),
           ),
         ),
       ],
@@ -105,7 +105,7 @@ class _MainSettingState extends State<MainSetting> {
             controller: _thCtrler,
             keyboardType: TextInputType.number,
             decoration: InputDecoration(border: InputBorder.none),
-            style: TextStyle(color: Theme.of(context).fTheme.text),
+            style: TextStyle(color: context.textColor),
           ),
         ),
       ],
@@ -141,9 +141,7 @@ class _MainSettingState extends State<MainSetting> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).fTheme.btn,
-        ),
+        style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
         onPressed: () {
           config.threadCount = int.parse(_thCtrler.text);
           config.maxDown = int.parse(_mDCtrler.text);
@@ -166,9 +164,7 @@ class _MainSettingState extends State<MainSetting> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).fTheme.btn,
-        ),
+        style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
         onPressed: () {
           setState(() {
             _thCtrler.text = config.threadCount.toString();

@@ -5,11 +5,11 @@ import 'package:fotrix/utils/common.dart';
 import 'package:fotrix/utils/theme.dart';
 import 'package:signals/signals_flutter.dart';
 
-class SideTask extends StatelessWidget {
-  SideTask({super.key, required this.data, required this.onTap});
+class TabsBar extends StatelessWidget {
+  TabsBar({super.key, required this.data, required this.onTap});
 
   final PageInfo data;
-  final dynamic Function(SideSubItemInfo item) onTap;
+  final dynamic Function(TabItem item) onTap;
 
   late final listLen = computed(
     () => [
@@ -22,22 +22,17 @@ class SideTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Watch(
-      (_) => _buildSide(
+      (_) => _buildTabBar(
         itemBuilder: (sideItem) {
           return [
             //侧边标题
-            _buildSideTitle(sideItem.title, context),
+            _buildTabBarTitle(sideItem.title, context),
             SizedBox(height: 30),
             //侧边子列表
-            _buildSideSubList(
+            _buildTabs(
               sideItem,
-              subItemBuilder: (subIdex, index) {
-                return _buildSideButton(
-                  subIdex,
-                  () => onTap(subIdex),
-                  index,
-                  context,
-                );
+              subItemBuilder: (subItem, index) {
+                return _buildTab(subItem, () => onTap(subItem), index, context);
               },
             ),
           ];
@@ -46,36 +41,31 @@ class SideTask extends StatelessWidget {
     );
   }
 
-  Widget _buildSide({
-    required List<Widget> Function(SideItemInfo item) itemBuilder,
+  Widget _buildTabBar({
+    required List<Widget> Function(TabsItem item) itemBuilder,
   }) {
-    return Column(children: itemBuilder(data.sideItem[0]));
+    return Column(children: itemBuilder(data.tabs[pInf.pInd]));
   }
 
-  Widget _buildSideTitle(String text, BuildContext ctx) {
+  Widget _buildTabBarTitle(String text, BuildContext ctx) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: buildLText(text, ctx),
     );
   }
 
-  Widget _buildSideSubList(
-    SideItemInfo item, {
-    required Widget Function(SideSubItemInfo item, int index) subItemBuilder,
+  Widget _buildTabs(
+    TabsItem item, {
+    required Widget Function(TabItem item, int index) subItemBuilder,
   }) {
     return Column(
-      children: List.generate(item.subItems.length, (index) {
-        return subItemBuilder(item.subItems[index], index);
+      children: List.generate(item.tabItems.length, (index) {
+        return subItemBuilder(item.tabItems[index], index);
       }),
     );
   }
 
-  Widget _buildSideButton(
-    SideSubItemInfo item,
-    Function func,
-    int index,
-    BuildContext ctx,
-  ) {
+  Widget _buildTab(TabItem item, Function func, int index, BuildContext ctx) {
     return Watch(
       (_) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
@@ -94,7 +84,9 @@ class SideTask extends StatelessWidget {
               buildIcon(item.icon, ctx),
               buildText(item.title, ctx),
               SizedBox(width: 5),
-              buildText(listLen.value[index].toString(), ctx),
+              pInf.pInd == 0
+                  ? buildText(listLen.value[index].toString(), ctx)
+                  : SizedBox.shrink(),
             ],
           ),
         ),
@@ -103,7 +95,7 @@ class SideTask extends StatelessWidget {
   }
 
   Color _getButtonColor(BuildContext context, int index) {
-    final theme = Theme.of(context).fTheme;
-    return pInf.mInd == index ? theme.tabActive : theme.tabDefault;
+    final theme = context;
+    return pInf.mInd == index ? theme.tabActiveColor : theme.tabDefaultColor;
   }
 }

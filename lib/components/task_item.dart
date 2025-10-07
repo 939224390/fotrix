@@ -28,7 +28,7 @@ class TaskItem extends StatelessWidget {
   Widget _buildTaskItem(Widget child, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-      child: Card(color: Theme.of(context).fTheme.card, child: child),
+      child: Card(color: context.cardColor, child: child),
     );
   }
 
@@ -49,7 +49,7 @@ class TaskItem extends StatelessWidget {
 
   Widget _buildOpButton(Task task, BuildContext context) {
     return IconButton(
-      color: Theme.of(context).fTheme.text,
+      color: context.textColor,
       icon: task.taskIcon.value,
       onPressed: () => taskLogic.sBtnLogic(task),
     );
@@ -89,7 +89,7 @@ class TaskItem extends StatelessWidget {
 
   Widget _buildDeleteButton(BuildContext context) {
     return IconButton(
-      color: Theme.of(context).fTheme.text,
+      color: context.textColor,
       onPressed: () => taskLogic.delBtn(task),
       icon: Icon(Icons.delete),
     );

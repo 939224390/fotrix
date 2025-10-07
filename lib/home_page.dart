@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fotrix/components/nav_bar.dart';
 import 'package:fotrix/components/main_about.dart';
 import 'package:fotrix/components/main_setting.dart';
-import 'package:fotrix/components/side_setting.dart';
-import 'package:fotrix/components/side_task.dart';
 import 'package:fotrix/components/main_task.dart';
+import 'package:fotrix/components/tabs_bar.dart';
 import 'package:fotrix/components/window_control.dart';
 import 'package:fotrix/logic/page_logic.dart';
 import 'package:fotrix/store/page_info.dart';
@@ -31,10 +30,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
       //导航栏
       _buildNavBar(NavBar(data: data, onTap: (item) => logic.navLogic(item))),
       //侧边栏
-      _buildSide([
-        SideTask(data: data, onTap: (item) => logic.sideLogic(item)),
-        SideSetting(data: data, onTap: (item) => logic.sideLogic(item)),
-      ]),
+      _buildTabBar(TabsBar(data: data, onTap: (item) => logic.tabLogic(item))),
 
       //页面栏
       _buildMain([
@@ -57,7 +53,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   ///侧边导航
   Widget _buildNavBar(Widget child) {
     return Container(
-      color: Theme.of(context).fTheme.nav,
+      color: context.navColor,
       width: 75,
       child: Column(
         children: [WindowControl(mode: "move"), Expanded(child: child)],
@@ -66,19 +62,12 @@ class _HomePageState extends State<HomePage> with TrayListener {
   }
 
   ///侧边导航
-  Widget _buildSide(List<Widget> children) {
+  Widget _buildTabBar(Widget child) {
     return Container(
-      color: Theme.of(context).fTheme.side,
+      color: context.sideColor,
       width: 200,
       child: Column(
-        children: [
-          WindowControl(mode: "move"),
-          Expanded(
-            child: Watch(
-              (_) => IndexedStack(index: pInf.pInd, children: children),
-            ),
-          ),
-        ],
+        children: [WindowControl(mode: "move"), Expanded(child: child)],
       ),
     );
   }
@@ -86,7 +75,7 @@ class _HomePageState extends State<HomePage> with TrayListener {
   Widget _buildMain(List<Widget> children) {
     return Expanded(
       child: Container(
-        color: Theme.of(context).fTheme.main,
+        color: context.mainColor,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [

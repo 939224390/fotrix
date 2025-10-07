@@ -5,7 +5,7 @@ class NavBar extends StatelessWidget {
   const NavBar({super.key, required this.data, required this.onTap});
 
   final PageInfo data;
-  final dynamic Function(NavBarItemInfo item) onTap;
+  final dynamic Function(NavItem item) onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +28,10 @@ class NavBar extends StatelessWidget {
   Widget _buildTopItem() {
     return Column(
       children: List.generate(
-        data.navBarTopItem.length,
+        data.navTop.length,
         (index) => _buildButton(
-          data.navBarTopItem[index].icon,
-          () => onTap(data.navBarTopItem[index]),
+          data.navTop[index].icon,
+          () => onTap(data.navTop[index]),
         ),
       ),
     );
@@ -40,10 +40,10 @@ class NavBar extends StatelessWidget {
   Widget _buildBottomItem() {
     return Column(
       children: List.generate(
-        data.navBarBottomItem.value.length,
+        data.navBtm.length,
         (index) => _buildButton(
-          data.navBarBottomItem.value[index].icon,
-          () => onTap(data.navBarBottomItem.value[index]),
+          data.navBtm[index].icon,
+          () => onTap(data.navBtm[index]),
         ),
       ),
     );
