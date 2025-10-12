@@ -22,12 +22,21 @@ class _MainSettingState extends State<MainSetting> {
     _initialValues();
   }
 
-  void _initialValues() async {
+  void _initialValues() {
     setState(() {
       _thCtrler.text = config.threadCount.toString();
       _mDCtrler.text = config.maxDown.toString();
       _tmpPath = config.savePath;
       pb = config.powerBoot;
+    });
+  }
+
+  void _updateValues() {
+    setState(() {
+      config.threadCount = int.parse(_thCtrler.text);
+      config.maxDown = int.parse(_mDCtrler.text);
+      config.savePath = _tmpPath;
+      config.powerBoot = pb;
     });
   }
 
@@ -117,13 +126,28 @@ class _MainSettingState extends State<MainSetting> {
       children: [
         _buildSec("保存路径"),
         Expanded(
-          child: buildSavePathBtn(
+          child: _buildSavePathBtn(
             _selectDirectory,
             buildText(_tmpPath, context),
             context,
           ),
         ),
       ],
+    );
+  }
+  Widget _buildSavePathBtn(
+    void Function()? onPressed,
+    Widget child,
+    BuildContext ctx,
+  ) {
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: ctx.buttonColor,
+        elevation: 0,
+        side: BorderSide.none,
+      ),
+      onPressed: onPressed,
+      child: child,
     );
   }
 
@@ -143,16 +167,7 @@ class _MainSettingState extends State<MainSetting> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
         onPressed: () {
-          config.threadCount = int.parse(_thCtrler.text);
-          config.maxDown = int.parse(_mDCtrler.text);
-          setState(() {
-            _thCtrler.text = config.threadCount.toString();
-            _mDCtrler.text = config.maxDown.toString();
-            config.savePath = _tmpPath;
-            config.powerBoot = pb;
-          });
-          final snackBar = SnackBar(content: Text("内容已保存"));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          _updateValues();
           config.saveConfig();
         },
         child: Text("保存"),
@@ -167,9 +182,7 @@ class _MainSettingState extends State<MainSetting> {
         style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
         onPressed: () {
           setState(() {
-            _thCtrler.text = config.threadCount.toString();
-            _tmpPath = config.savePath;
-            pb = config.powerBoot;
+            _initialValues();
           });
         },
         child: Text("取消"),

@@ -2,32 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:fotrix/components/add_task.dart';
 import 'package:fotrix/store/config.dart';
 import 'package:fotrix/store/page_info.dart';
+import 'package:go_router/go_router.dart';
 
 class PageLogic {
-  late BuildContext context;
-
-  void init(BuildContext context) {
-    this.context = context;
-  }
-
-  void changePage(int p) {
-    pInf.mInd = 0;
-    pInf.pInd = p;
+  void changeTab(int p) {
+    pInf.mainIndex = 0;
+    pInf.tabIndex = p;
   }
 
   void changeMain(int m) {
-    pInf.mInd = m;
+    pInf.mainIndex = m;
   }
 
   //导航栏逻辑
-  void navLogic(NavItem item) {
+  void navLogic(NavItem item, BuildContext context) {
     switch (item.tag) {
       case NavStatus.home:
-        changePage(0);
+        context.go("/task/active");
+        changeTab(0);
         changeActive(TabStatus.active);
         break;
       case NavStatus.list:
-        changePage(0);
+        context.go("/task/active");
+        changeTab(0);
         changeActive(TabStatus.active);
         break;
       case NavStatus.add:
@@ -38,31 +35,37 @@ class PageLogic {
         break;
       case NavStatus.settings:
         changeActive(TabStatus.setting);
-        changePage(1);
+        changeTab(1);
+        context.go("/setting/general");
         break;
     }
   }
 
   //侧边栏逻辑
-  void tabLogic(TabItem item) {
+  void tabLogic(TabItem item, BuildContext context) {
     switch (item.tag) {
       case TabStatus.active:
+        context.go("/task/active");
         changeMain(0);
         changeActive(TabStatus.active);
         break;
       case TabStatus.waiting:
+        context.go("/task/waiting");
         changeMain(1);
         changeActive(TabStatus.waiting);
         break;
       case TabStatus.complete:
+        context.go("/task/complete");
         changeMain(2);
         changeActive(TabStatus.complete);
         break;
       case TabStatus.setting:
+        context.go("/setting/general");
         changeMain(0);
         changeActive(TabStatus.setting);
         break;
       case TabStatus.about:
+        context.go("/setting/about");
         changeMain(1);
         changeActive(TabStatus.about);
         break;

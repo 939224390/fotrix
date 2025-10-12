@@ -22,8 +22,8 @@ class TrayService {
       MenuItem(
         label: 'Fotrix',
         onClick: (_) {
-          pInf.mInd = 0;
-          pInf.pInd = 0;
+          pInf.mainIndex = 0;
+          pInf.tabIndex = 0;
           windowManager.show();
         },
       ),
@@ -31,8 +31,8 @@ class TrayService {
       MenuItem(
         label: "设置",
         onClick: (_) {
-          pInf.mInd = 0;
-          pInf.pInd = 1;
+          pInf.mainIndex = 0;
+          pInf.tabIndex = 1;
           windowManager.show();
         },
       ),

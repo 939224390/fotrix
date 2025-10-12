@@ -1,11 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/store/page_info.dart';
+import 'package:fotrix/utils/tray_service.dart';
+import 'package:tray_manager/tray_manager.dart';
 
-class NavBar extends StatelessWidget {
+class NavBar extends StatefulWidget {
   const NavBar({super.key, required this.data, required this.onTap});
 
   final PageInfo data;
   final dynamic Function(NavItem item) onTap;
+
+  @override
+  State<NavBar> createState() => _NavBarState();
+}
+
+class _NavBarState extends State<NavBar> with TrayListener {
+  @override
+  void initState() {
+    trayManager.addListener(this);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    trayManager.removeListener(this);
+    super.dispose();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    ts.mouseRightDown();
+  }
+
+  @override
+  void onTrayIconMouseDown() {
+    ts.onTrayIconClick();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,10 +57,10 @@ class NavBar extends StatelessWidget {
   Widget _buildTopItem() {
     return Column(
       children: List.generate(
-        data.navTop.length,
+        widget.data.navTop.length,
         (index) => _buildButton(
-          data.navTop[index].icon,
-          () => onTap(data.navTop[index]),
+          widget.data.navTop[index].icon,
+          () => widget.onTap(widget.data.navTop[index]),
         ),
       ),
     );
@@ -40,10 +69,10 @@ class NavBar extends StatelessWidget {
   Widget _buildBottomItem() {
     return Column(
       children: List.generate(
-        data.navBtm.length,
+        widget.data.navBtm.length,
         (index) => _buildButton(
-          data.navBtm[index].icon,
-          () => onTap(data.navBtm[index]),
+          widget.data.navBtm[index].icon,
+          () => widget.onTap(widget.data.navBtm[index]),
         ),
       ),
     );

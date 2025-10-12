@@ -3,20 +3,20 @@ import 'package:fotrix/store/config.dart';
 import 'package:signals/signals_flutter.dart';
 
 class PageInfo {
-  // 分类索引
-  final _pInd = signal(0);
-  // 主页面索引
-  final _mInd = signal(0);
+  // 选项卡组
+  final _tabIndex = signal(0);
+  // 页面
+  final _mainIndex = signal(0);
 
-  int get pInd => _pInd.value;
-  int get mInd => _mInd.value;
+  int get tabIndex => _tabIndex.value;
+  int get mainIndex => _mainIndex.value;
 
-  set pInd(int p) {
-    _pInd.value = p;
+  set tabIndex(int t) {
+    _tabIndex.value = t;
   }
 
-  set mInd(int m) {
-    _mInd.value = m;
+  set mainIndex(int m) {
+    _mainIndex.value = m;
   }
 
   // 导航栏图标

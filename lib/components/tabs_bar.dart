@@ -44,7 +44,7 @@ class TabsBar extends StatelessWidget {
   Widget _buildTabBar({
     required List<Widget> Function(TabsItem item) itemBuilder,
   }) {
-    return Column(children: itemBuilder(data.tabs[pInf.pInd]));
+    return Column(children: itemBuilder(data.tabs[data.tabIndex]));
   }
 
   Widget _buildTabBarTitle(String text, BuildContext ctx) {
@@ -84,7 +84,7 @@ class TabsBar extends StatelessWidget {
               buildIcon(item.icon, ctx),
               buildText(item.title, ctx),
               SizedBox(width: 5),
-              pInf.pInd == 0
+              data.tabIndex == 0
                   ? buildText(listLen.value[index].toString(), ctx)
                   : SizedBox.shrink(),
             ],
@@ -96,6 +96,8 @@ class TabsBar extends StatelessWidget {
 
   Color _getButtonColor(BuildContext context, int index) {
     final theme = context;
-    return pInf.mInd == index ? theme.tabActiveColor : theme.tabDefaultColor;
+    return data.mainIndex == index
+        ? theme.tabActiveColor
+        : theme.tabDefaultColor;
   }
 }

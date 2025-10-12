@@ -37,18 +37,4 @@ Widget buildMainTitle(String text, BuildContext ctx) {
   );
 }
 
-Widget buildSavePathBtn(
-  void Function()? onPressed,
-  Widget child,
-  BuildContext ctx,
-) {
-  return ElevatedButton(
-    style: ElevatedButton.styleFrom(
-      backgroundColor: ctx.buttonColor,
-      elevation: 0,
-      side: BorderSide.none,
-    ),
-    onPressed: onPressed,
-    child: child,
-  );
-}
+

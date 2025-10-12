@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/action.dart';
+import 'package:fotrix/router.dart';
 import 'package:fotrix/store/config.dart';
 import 'package:fotrix/utils/theme.dart';
 import 'package:fotrix/utils/tray_service.dart';
-import 'package:fotrix/home_page.dart';
 import 'package:signals/signals_flutter.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -19,7 +19,6 @@ void main() async {
     titleBarStyle: TitleBarStyle.hidden,
   );
   windowManager.waitUntilReadyToShow(windowOptions, () async {
-    // await windowManager.hide();
     await windowManager.focus();
   });
 
@@ -50,21 +49,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.detached) {
-      // 应用关闭时调用关闭 Aria2 服务的方法
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Watch((context) {
-      return MaterialApp(
+      return MaterialApp.router(
         theme: ThemeManager.lightTheme,
         darkTheme: ThemeManager.darkTheme,
         themeMode: config.darkMode ? ThemeMode.dark : ThemeMode.light,
         debugShowCheckedModeBanner: false,
-        home: const HomePage(),
+        routerConfig: router,
       );
     });
   }

@@ -7,15 +7,16 @@ import 'package:fotrix/utils/theme.dart';
 import 'package:signals/signals_flutter.dart';
 
 class MainTask extends StatelessWidget {
-  MainTask({super.key, required this.data});
+  MainTask({super.key, required this.data, required this.index});
   final PageInfo data;
+  final int index;
 
   late final title = computed(
-    () => data.tabs[pInf.pInd].tabItems[pInf.mInd].title,
+    () => data.tabs[data.tabIndex].tabItems[data.mainIndex].title,
   );
 
   late final currList = computed(
-    () => switch (pInf.mInd) {
+    () => switch (index) {
       0 => taskList.active,
       1 => taskList.waiting,
       2 => taskList.complete,
