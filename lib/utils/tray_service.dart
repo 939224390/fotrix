@@ -1,11 +1,14 @@
 import "dart:io";
+import "package:flutter/material.dart";
 import "package:fotrix/store/page_info.dart";
+import "package:go_router/go_router.dart";
 import "package:tray_manager/tray_manager.dart";
 import "package:window_manager/window_manager.dart";
 import "package:fotrix/api/aria2_api.dart";
 
 class TrayService {
   final TrayManager _tm = TrayManager.instance;
+  BuildContext? context;
 
   final iconDefault =
       Platform.isWindows
@@ -17,13 +20,14 @@ class TrayService {
           : "assets/images/active.png";
   String status = "default";
 
-  final menu = Menu(
+  Menu get menu => Menu(
     items: [
       MenuItem(
         label: 'Fotrix',
         onClick: (_) {
           pInf.mainIndex = 0;
           pInf.tabIndex = 0;
+          context?.go("/task/active");
           windowManager.show();
         },
       ),
@@ -33,6 +37,7 @@ class TrayService {
         onClick: (_) {
           pInf.mainIndex = 0;
           pInf.tabIndex = 1;
+          context?.go("/setting/general");
           windowManager.show();
         },
       ),
@@ -84,6 +89,13 @@ class TrayService {
   void handleWindowClose() async {
     await windowManager.hide();
     await initTray(); // 确保托盘初始化
+  }
+
+  void updateContext(BuildContext? newContext) {
+    context = newContext;
+    if (context != null) {
+      _tm.setContextMenu(menu);
+    }
   }
 }
 

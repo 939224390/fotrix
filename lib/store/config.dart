@@ -1,19 +1,16 @@
-import 'dart:io';
+import 'package:fotrix/api/config_api.dart';
 import 'package:fotrix/utils/logger.dart';
 import 'package:fotrix/types/types.dart';
-import 'package:fotrix/utils/cross.dart';
-import 'dart:convert';
 import 'package:launch_at_startup/launch_at_startup.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:signals/signals.dart';
 import "package:fotrix/api/aria2_api.dart";
 
 class Config {
   final _darkMode = signal(true);
-  bool _powerBoot = false;
-  int _threadCount = 6;
-  String savePath = "D:\\Download";
-  int maxDown = 5;
+  late bool _powerBoot;
+  late int _threadCount;
+  late String savePath;
+  late int maxDown;
 
   late final _aria2Version = signal("-1");
   String version = "0.0.1";
@@ -29,10 +26,14 @@ class Config {
 
   set powerBoot(bool value) {
     _powerBoot = value;
-    if (_powerBoot == true) {
-      launchAtStartup.enable();
-    } else {
-      launchAtStartup.disable();
+    try {
+      if (_powerBoot == true) {
+        launchAtStartup.enable();
+      } else {
+        launchAtStartup.disable();
+      }
+    } catch (e) {
+      logger.error("设置开机自启失败 $e");
     }
   }
 
@@ -45,47 +46,27 @@ class Config {
     _darkMode.value = !_darkMode.value;
   }
 
-  //读取配置文件
-  Future<void> loadConfig() async {
+  Future<void> loadConfigBox() async {
     try {
-      PackageInfo packageInfo = await PackageInfo.fromPlatform();
-      launchAtStartup.setup(
-        appName: packageInfo.appName,
-        appPath: Platform.resolvedExecutable,
-      );
-
-      await Cross().createConfig();
-      final configPath = "${await Cross().getDocPath()}/config.json";
-      final jsonString = await File(configPath).readAsString();
-      final config = jsonDecode(jsonString);
-      _darkMode.value = config['darkMode'] ?? darkMode;
-      powerBoot = config['powerBoot'] ?? powerBoot;
-
-      savePath = config['savePath'] ?? savePath;
-      threadCount = config['threadCount'] ?? threadCount;
-      maxDown = config['maxDown'] ?? maxDown;
-
+      await logger.info("正在加载配置文件");
+      _darkMode.value = getDarkMode;
+      powerBoot = getPowerBoot;
+      threadCount = getThreadCount;
+      maxDown = getMaxDown;
+      savePath = getSavePath;
       await logger.info("加载配置文件");
     } catch (e) {
       await logger.error("加载配置文件失败 $e");
     }
   }
 
-  //保存配置文件
-  Future<void> saveConfig() async {
+  void saveConfigBox() async {
     try {
-      final configPath = "${await Cross().getDocPath()}/config.json";
-      final file = File(configPath);
-      await file.writeAsString(
-        jsonEncode({
-          'savePath': savePath,
-          'threadCount': threadCount,
-          'darkMode': darkMode,
-          'powerBoot': powerBoot,
-          'maxDown': maxDown,
-        }),
-      );
-
+      setDarkMode(darkMode);
+      setPowerBoot(powerBoot);
+      setThreadCount(threadCount);
+      setMaxDown(maxDown);
+      setSavePath(savePath);
       await aria2Api.updateConfig(
         UConfig(savePath: savePath, threadCount: threadCount, maxDown: maxDown),
       );

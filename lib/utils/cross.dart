@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:fotrix/store/config.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:process_run/shell.dart';
 
@@ -20,23 +19,6 @@ class Cross {
       await file.create();
     }
     return '${await getDocPath()}/fotrix.log';
-  }
-
-  //创建配置文件件
-  Future<void> createConfig() async {
-    try {
-      final dir = Directory(await getDocPath());
-      final file = File('${await getDocPath()}/config.json');
-      if (!await dir.exists()) {
-        await dir.create();
-      }
-      if (!await file.exists()) {
-        await file.create();
-        await config.saveConfig();
-      }
-    } catch (e) {
-      await logger.error("创建配置文件失败 $e");
-    }
   }
 
   Future<void> createList() async {}

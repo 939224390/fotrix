@@ -1,18 +1,35 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:fotrix/api/aria2_api.dart';
+import 'package:fotrix/api/config_api.dart';
 import 'package:fotrix/store/config.dart';
 import 'package:fotrix/store/task_list.dart';
 import 'package:fotrix/utils/aria2_client.dart';
 import 'package:fotrix/utils/logger.dart';
 import 'package:fotrix/utils/tray_service.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class AppAction {
   static Future<void> init() async {
+    // 初始化启动器
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    launchAtStartup.setup(
+      appName: packageInfo.appName,
+      appPath: Platform.resolvedExecutable,
+    );
     // 初始化日志
     await logger.initLog();
+    await logger.info("------Start App------");
     // 初始化配置
-    await config.loadConfig();
+    await Hive.initFlutter();
+    await initConfig();
+    await config.loadConfigBox();
+  }
+
+  static Future<void> startAria2() async {
     // 初始化aria2
     await a2c.start();
 
@@ -52,5 +69,4 @@ class AppAction {
     final res = await aria2Api.tellWaiting(0, 100);
     taskList.checkWaiting(res);
   }
-
 }

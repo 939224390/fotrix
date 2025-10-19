@@ -38,6 +38,7 @@ class _NavBarState extends State<NavBar> with TrayListener {
 
   @override
   Widget build(BuildContext context) {
+    ts.updateContext(context);
     //左侧导航栏
     return _buildNavgation([
       //上部分按钮

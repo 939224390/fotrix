@@ -112,7 +112,7 @@ final router = GoRouter(
   ],
 );
 
-///侧边导航
+///导航
 Widget _buildNavBar(Widget child, BuildContext context) {
   return Container(
     color: context.navColor,
@@ -123,7 +123,7 @@ Widget _buildNavBar(Widget child, BuildContext context) {
   );
 }
 
-///侧边导航
+///选项卡组
 Widget _buildTabBar(Widget child, BuildContext context) {
   return Container(
     color: context.sideColor,
@@ -134,7 +134,7 @@ Widget _buildTabBar(Widget child, BuildContext context) {
   );
 }
 
-// 主页面
+// 选项卡
 Widget _buildMain(Widget child, BuildContext context) {
   return Expanded(
     child: Container(

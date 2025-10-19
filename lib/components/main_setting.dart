@@ -135,6 +135,7 @@ class _MainSettingState extends State<MainSetting> {
       ],
     );
   }
+
   Widget _buildSavePathBtn(
     void Function()? onPressed,
     Widget child,
@@ -168,7 +169,7 @@ class _MainSettingState extends State<MainSetting> {
         style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
         onPressed: () {
           _updateValues();
-          config.saveConfig();
+          config.saveConfigBox();
         },
         child: Text("保存"),
       ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/action.dart';
+import 'package:fotrix/api/config_api.dart';
 import 'package:fotrix/router.dart';
 import 'package:fotrix/store/config.dart';
 import 'package:fotrix/utils/theme.dart';
@@ -38,13 +39,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
-    // 初始化配置
+
     WidgetsBinding.instance.addObserver(this);
+    // 启动aria2
+    AppAction.startAria2();
   }
 
   @override
   void dispose() async {
     WidgetsBinding.instance.removeObserver(this);
+    closeConfigBox();
     super.dispose();
   }
 
