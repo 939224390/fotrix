@@ -13,6 +13,7 @@ class TabsBar extends StatelessWidget {
 
   late final listLen = computed(
     () => [
+      taskList.totalList.length,
       taskList.active.length,
       taskList.waiting.length,
       taskList.complete.length,

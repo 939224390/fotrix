@@ -21,21 +21,6 @@ bool get getDarkMode {
   }
 }
 
-//开机自启
-void setPowerBoot(bool value) {
-  _upInfo('powerBoot', value);
-}
-
-bool get getPowerBoot {
-  final res = _getInfo('powerBoot');
-  if (res != null) {
-    return res;
-  } else {
-    setPowerBoot(false);
-    return false;
-  }
-}
-
 //线程数量
 void setThreadCount(int value) {
   _upInfo('threadCount', value);

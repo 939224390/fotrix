@@ -17,9 +17,10 @@ class MainTask extends StatelessWidget {
 
   late final currList = computed(
     () => switch (index) {
-      0 => taskList.active,
-      1 => taskList.waiting,
-      2 => taskList.complete,
+      0 => taskList.totalList,
+      1 => taskList.active,
+      2 => taskList.waiting,
+      3 => taskList.complete,
       _ => [],
     },
   );

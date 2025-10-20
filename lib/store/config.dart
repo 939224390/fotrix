@@ -7,7 +7,7 @@ import "package:fotrix/api/aria2_api.dart";
 
 class Config {
   final _darkMode = signal(true);
-  late bool _powerBoot;
+  late bool powerBoot;
   late int _threadCount;
   late String savePath;
   late int maxDown;
@@ -17,24 +17,10 @@ class Config {
 
   bool get darkMode => _darkMode.value;
   int get threadCount => _threadCount;
-  bool get powerBoot => _powerBoot;
   String get aria2Version => _aria2Version.value;
 
   set threadCount(int count) {
     _threadCount = (count <= 16 && count >= 0) ? count : 1;
-  }
-
-  set powerBoot(bool value) {
-    _powerBoot = value;
-    try {
-      if (_powerBoot == true) {
-        launchAtStartup.enable();
-      } else {
-        launchAtStartup.disable();
-      }
-    } catch (e) {
-      logger.error("设置开机自启失败 $e");
-    }
   }
 
   set aria2Version(String value) {
@@ -44,13 +30,14 @@ class Config {
   //切换模式
   void changeTheme() {
     _darkMode.value = !_darkMode.value;
+    setDarkMode(darkMode);
   }
 
   Future<void> loadConfigBox() async {
     try {
       await logger.info("正在加载配置文件");
       _darkMode.value = getDarkMode;
-      powerBoot = getPowerBoot;
+      powerBoot = await launchAtStartup.isEnabled();
       threadCount = getThreadCount;
       maxDown = getMaxDown;
       savePath = getSavePath;
@@ -62,11 +49,15 @@ class Config {
 
   void saveConfigBox() async {
     try {
-      setDarkMode(darkMode);
-      setPowerBoot(powerBoot);
       setThreadCount(threadCount);
       setMaxDown(maxDown);
       setSavePath(savePath);
+      if (powerBoot == true) {
+        launchAtStartup.enable();
+      } else {
+        launchAtStartup.disable();
+      }
+
       await aria2Api.updateConfig(
         UConfig(savePath: savePath, threadCount: threadCount, maxDown: maxDown),
       );

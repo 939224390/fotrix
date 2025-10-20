@@ -18,14 +18,14 @@ class PageLogic {
   void navLogic(NavItem item, BuildContext context) {
     switch (item.tag) {
       case NavStatus.home:
-        context.go("/task/active");
+        context.go("/task/total");
         changeTab(0);
-        changeActive(TabStatus.active);
+        changeActive(TabStatus.total);
         break;
       case NavStatus.list:
-        context.go("/task/active");
+        context.go("/task/total");
         changeTab(0);
-        changeActive(TabStatus.active);
+        changeActive(TabStatus.total);
         break;
       case NavStatus.add:
         showDialog(context: context, builder: (context) => AddTask());
@@ -44,19 +44,24 @@ class PageLogic {
   //侧边栏逻辑
   void tabLogic(TabItem item, BuildContext context) {
     switch (item.tag) {
+      case TabStatus.total:
+        context.go("/task/total");
+        changeMain(0);
+        changeActive(TabStatus.total);
+        break;
       case TabStatus.active:
         context.go("/task/active");
-        changeMain(0);
+        changeMain(1);
         changeActive(TabStatus.active);
         break;
       case TabStatus.waiting:
         context.go("/task/waiting");
-        changeMain(1);
+        changeMain(2);
         changeActive(TabStatus.waiting);
         break;
       case TabStatus.complete:
         context.go("/task/complete");
-        changeMain(2);
+        changeMain(3);
         changeActive(TabStatus.complete);
         break;
       case TabStatus.setting:

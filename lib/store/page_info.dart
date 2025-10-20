@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/store/config.dart';
 import 'package:signals/signals_flutter.dart';
 
 class PageInfo {
@@ -34,23 +33,19 @@ class PageInfo {
     ];
     //导航栏下部选项
     navBtm = [
-      NavItem(
-        computed(
-          () => config.darkMode ? Icons.dark_mode : Icons.light_mode,
-        ).value,
-        NavStatus.darkMode,
-      ),
+      NavItem(Icons.light_mode, NavStatus.darkMode),
       NavItem(Icons.settings, NavStatus.settings),
     ];
     //侧边栏选项
     tabs = [
       TabsItem("任务列表", [
         TabItem(
-          icon: Icons.play_arrow,
-          title: "下载中",
-          tag: TabStatus.active,
+          icon: Icons.star,
+          title: "全部",
+          tag: TabStatus.total,
           isSelect: true,
         ),
+        TabItem(icon: Icons.play_arrow, title: "下载中", tag: TabStatus.active),
         TabItem(icon: Icons.stop, title: "等待中", tag: TabStatus.waiting),
         TabItem(
           icon: Icons.download_done,
@@ -109,10 +104,11 @@ class TabItem {
 }
 
 class TabStatus {
+  static const String total = "total";
   static const String active = "active";
   static const String waiting = "waiting";
   static const String complete = "complete";
   static const String setting = "setting";
+  static const String advanced = "advanced";
   static const String about = "about";
-  static const String test = "test";
 }

@@ -15,6 +15,10 @@ class TaskList {
   List<Task> get complete => _complete.value;
   List<Task> get waiting => _waiting.value;
 
+  Computed<List<Task>> get _totalList =>
+      computed(() => [..._active.value, ..._complete.value, ..._waiting.value]);
+  List<Task> get totalList => _totalList.value;
+
   //初始化任务
   Future<Task> createTask(dynamic status, TaskStatus taskStatus) async {
     final task = await _initialTask(

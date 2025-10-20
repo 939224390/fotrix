@@ -54,8 +54,10 @@ class Task {
         break;
       case TaskStatus.error:
         icon = Icons.priority_high;
+        break;
       case TaskStatus.remove:
         icon = Icons.delete;
+        break;
     }
     return Icon(icon);
   });

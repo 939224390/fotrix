@@ -14,7 +14,7 @@ import 'package:go_router/go_router.dart';
 final data = pInf;
 final logic = PageLogic();
 
-final taskId = {"active": 0, "waiting": 1, "complete": 2};
+final taskId = {"total": 0, "active": 1, "waiting": 2, "complete": 3};
 final settingPage = {
   "general": MainSetting(),
   "advanced": MainAdvanced(),
@@ -41,7 +41,7 @@ class NoTransitionPage<T> extends Page<T> {
 }
 
 final router = GoRouter(
-  initialLocation: "/task/active",
+  initialLocation: "/task/total",
 
   routes: [
     ShellRoute(
