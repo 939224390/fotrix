@@ -9,7 +9,7 @@ import "package:web_socket_channel/io.dart";
 import "package:json_rpc_2/json_rpc_2.dart";
 
 class Aria2Client {
-  final String wsUrl = "ws://localhost:16800/jsonrpc";
+  final String wsUrl = "ws://localhost:${config.port}/jsonrpc";
   IOWebSocketChannel? wsChannel;
   Client? client;
   Process? aria2Process;
@@ -54,25 +54,32 @@ class Aria2Client {
   Future<void> writeConf() async {
     try {
       final aria2ConfPath = await Cross().getAria2ConfPath();
-      //   final aria2LogPath = await Cross().getAria2LogPath();
       final aria2Conf = File(aria2ConfPath);
 
       final confContent = StringBuffer();
-      confContent.write("enable-rpc=true\n");
-      confContent.write("rpc-allow-origin-all=true\n");
-      confContent.write("rpc-listen-all=true\n");
-      confContent.write("rpc-max-request-size=10M\n");
-      confContent.write("rpc-save-upload-metadata=true\n");
-      confContent.write("min-split-size=1M\n");
-      confContent.write("disk-cache=16M\n");
-      confContent.write("file-allocation=trunc\n");
-      confContent.write("continue=true\n");
-      confContent.write("rpc-listen-port=16800\n");
-      confContent.write("save-session-interval=60\n");
-      confContent.write("max-concurrent-downloads=${config.maxDown}\n");
-      confContent.write("max-connection-per-server=${config.threadCount}\n");
-      //confContent.write("log=$aria2LogPath\n");
-      confContent.write("dir=${config.savePath}\n");
+
+      List<String> confLines = [
+        "enable-rpc=true\n",
+        "rpc-allow-origin-all=true\n",
+        "rpc-listen-all=true\n",
+        "rpc-max-request-size=10M\n",
+        "rpc-save-upload-metadata=true\n",
+        "min-split-size=1M\n",
+        "disk-cache=16M\n",
+        "file-allocation=trunc\n",
+        "continue=true\n",
+        "rpc-listen-port=${config.port}\n",
+        "save-session-interval=60\n",
+        "max-concurrent-downloads=${config.maxDown}\n",
+        "max-connection-per-server=${config.threadCount}\n",
+        "dir=${config.savePath}\n",
+      ];
+      if (config.enableAria2Log) {
+        final aria2LogPath = await Cross().getAria2LogPath();
+        confLines.add("log=$aria2LogPath\n");
+      }
+
+      confContent.writeAll(confLines);
       if (!await aria2Conf.exists()) {
         await aria2Conf.create();
       } else {

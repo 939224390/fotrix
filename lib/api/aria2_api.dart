@@ -1,5 +1,6 @@
 import 'package:fotrix/types/types.dart';
 import 'package:fotrix/utils/aria2_client.dart';
+import 'package:fotrix/utils/cross.dart';
 import 'package:fotrix/utils/logger.dart';
 
 class Aria2Api {
@@ -117,13 +118,16 @@ class Aria2Api {
 
   //更新aria2配置
   Future<void> updateConfig(UConfig config) async {
-    await a2c.send("aria2.changeGlobalOption", [
-      {
-        'dir': config.savePath,
-        'max-concurrent-downloads': config.maxDown,
-        'max-connection-per-server': config.threadCount,
-      },
-    ]);
+    Map<String, dynamic> options = {
+      'dir': config.savePath,
+      'max-concurrent-downloads': config.maxDown,
+      'max-connection-per-server': config.threadCount,
+      'rpc-listen-port': config.port,
+    };
+    if (config.enableAria2Log) {
+      options['log'] = await Cross().getAria2LogPath();
+    }
+    await a2c.send("aria2.changeGlobalOption", [options]);
   }
 
   Future<void> shutdown() async {

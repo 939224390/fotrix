@@ -60,6 +60,7 @@ class PageInfo {
           tag: TabStatus.setting,
           isSelect: true,
         ),
+        TabItem(icon: Icons.build, title: "高级", tag: TabStatus.advanced),
         TabItem(icon: Icons.report, title: "关于", tag: TabStatus.about),
       ]),
     ];

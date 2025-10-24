@@ -69,9 +69,14 @@ class PageLogic {
         changeMain(0);
         changeActive(TabStatus.setting);
         break;
+      case TabStatus.advanced:
+        context.go("/setting/advanced");
+        changeMain(1);
+        changeActive(TabStatus.advanced);
+        break;
       case TabStatus.about:
         context.go("/setting/about");
-        changeMain(1);
+        changeMain(2);
         changeActive(TabStatus.about);
         break;
     }

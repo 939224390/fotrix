@@ -66,12 +66,42 @@ int get getMaxDown {
   }
 }
 
+//是否启用aria2配置文件
+void setEnableAria2Conf(bool value) {
+  _upInfo('enableAria2Conf', value);
+}
+
+bool get getEnableAria2Conf {
+  final res = _getInfo('enableAria2Conf');
+  if (res != null) {
+    return res;
+  } else {
+    setEnableAria2Conf(false);
+    return false;
+  }
+}
+
+//aria2端口
+void setPort(int value) {
+  _upInfo('port', value);
+}
+
+int get getPort {
+  final res = _getInfo('port');
+  if (res != null) {
+    return res;
+  } else {
+    setPort(16800);
+    return 16800;
+  }
+}
+
 void _upInfo(String key, dynamic value) {
   configBox?.put(key, value);
 }
 
 dynamic _getInfo(String key) {
-  final value = configBox?.get(key);  
+  final value = configBox?.get(key);
   return value;
 }
 

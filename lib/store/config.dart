@@ -11,6 +11,8 @@ class Config {
   late int _threadCount;
   late String savePath;
   late int maxDown;
+  late bool enableAria2Log;
+  late int port;
 
   late final _aria2Version = signal("-1");
   String version = "0.0.1";
@@ -41,6 +43,8 @@ class Config {
       threadCount = getThreadCount;
       maxDown = getMaxDown;
       savePath = getSavePath;
+      enableAria2Log = getEnableAria2Conf;
+      port = getPort;
       await logger.info("加载配置文件");
     } catch (e) {
       await logger.error("加载配置文件失败 $e");
@@ -52,6 +56,8 @@ class Config {
       setThreadCount(threadCount);
       setMaxDown(maxDown);
       setSavePath(savePath);
+      setEnableAria2Conf(enableAria2Log);
+      setPort(port);
       if (powerBoot == true) {
         launchAtStartup.enable();
       } else {
@@ -59,7 +65,13 @@ class Config {
       }
 
       await aria2Api.updateConfig(
-        UConfig(savePath: savePath, threadCount: threadCount, maxDown: maxDown),
+        UConfig(
+          savePath: savePath,
+          threadCount: threadCount,
+          maxDown: maxDown,
+          enableAria2Log: enableAria2Log,
+          port: port,
+        ),
       );
     } catch (e) {
       await logger.error("保存配置文件失败 $e");
