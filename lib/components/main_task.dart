@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:fotrix/utils/common.dart';
-import 'package:fotrix/components/task_item.dart';
+import 'package:fotrix/components/common.dart';
+import 'package:fotrix/components/taskitem/task_item.dart';
 import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/task_list.dart';
 import 'package:fotrix/utils/theme.dart';

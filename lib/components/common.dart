@@ -16,10 +16,6 @@ Widget buildLText(String text, BuildContext ctx) {
   return Text(text, style: TextStyle(color: ctx.textColor, fontSize: 20));
 }
 
-//默认图标
-Widget buildIcon(IconData icon, BuildContext ctx) {
-  return Icon(icon, color: ctx.textColor);
-}
 
 //默认分隔线
 Widget buildDivider() {

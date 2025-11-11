@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/store/task_list.dart';
-import 'package:fotrix/utils/common.dart';
+import 'package:fotrix/components/common.dart';
 import 'package:fotrix/utils/theme.dart';
 
 class AddTask extends StatefulWidget {

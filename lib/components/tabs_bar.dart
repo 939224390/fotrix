@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fotrix/store/page_info.dart';
 import 'package:fotrix/store/task_list.dart';
-import 'package:fotrix/utils/common.dart';
+import 'package:fotrix/components/common.dart';
 import 'package:fotrix/utils/theme.dart';
 import 'package:signals/signals_flutter.dart';
 
-class TabsBar extends StatelessWidget {
-  TabsBar({super.key, required this.data, required this.onTap});
+class TabsBar extends StatefulWidget {
+  const TabsBar({super.key, required this.data, required this.onTap});
 
   final PageInfo data;
   final dynamic Function(TabItem item) onTap;
 
+  @override
+  State<TabsBar> createState() => _TabsBarState();
+}
+
+class _TabsBarState extends State<TabsBar> {
   late final listLen = computed(
     () => [
       taskList.totalList.length,
@@ -27,13 +32,13 @@ class TabsBar extends StatelessWidget {
         itemBuilder: (sideItem) {
           return [
             //侧边标题
-            _buildTabBarTitle(sideItem.title, context),
+            _tabBarTitle(sideItem.title),
             SizedBox(height: 30),
             //侧边子列表
             _buildTabs(
               sideItem,
               subItemBuilder: (subItem, index) {
-                return _buildTab(subItem, () => onTap(subItem), index, context);
+                return _buildTab(subItem, () => widget.onTap(subItem), index);
               },
             ),
           ];
@@ -45,13 +50,15 @@ class TabsBar extends StatelessWidget {
   Widget _buildTabBar({
     required List<Widget> Function(TabsItem item) itemBuilder,
   }) {
-    return Column(children: itemBuilder(data.tabs[data.tabIndex]));
+    return Column(
+      children: itemBuilder(widget.data.tabs[widget.data.tabIndex]),
+    );
   }
 
-  Widget _buildTabBarTitle(String text, BuildContext ctx) {
+  Widget _tabBarTitle(String text) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: buildLText(text, ctx),
+      child: buildLText(text, context),
     );
   }
 
@@ -66,14 +73,14 @@ class TabsBar extends StatelessWidget {
     );
   }
 
-  Widget _buildTab(TabItem item, Function func, int index, BuildContext ctx) {
+  Widget _buildTab(TabItem item, Function func, int index) {
     return Watch(
       (_) => Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: ElevatedButton(
           onPressed: func as void Function()?,
           style: ElevatedButton.styleFrom(
-            backgroundColor: _getButtonColor(ctx, index),
+            backgroundColor: _getButtonColor(index),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
@@ -82,11 +89,11 @@ class TabsBar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              buildIcon(item.icon, ctx),
-              buildText(item.title, ctx),
+              Icon(item.icon, color: context.textColor),
+              buildText(item.title, context),
               SizedBox(width: 5),
-              data.tabIndex == 0
-                  ? buildText(listLen.value[index].toString(), ctx)
+              widget.data.tabIndex == 0
+                  ? buildText(listLen.value[index].toString(), context)
                   : SizedBox.shrink(),
             ],
           ),
@@ -95,10 +102,9 @@ class TabsBar extends StatelessWidget {
     );
   }
 
-  Color _getButtonColor(BuildContext context, int index) {
-    final theme = context;
-    return data.mainIndex == index
-        ? theme.tabActiveColor
-        : theme.tabDefaultColor;
+  Color _getButtonColor(int index) {
+    return widget.data.mainIndex == index
+        ? context.tabActiveColor
+        : context.tabDefaultColor;
   }
 }

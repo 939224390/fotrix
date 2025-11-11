@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import "package:fotrix/utils/common.dart";
+import "package:fotrix/components/common.dart";
 import "package:fotrix/store/config.dart";
 import "package:fotrix/utils/theme.dart";
 import "package:signals/signals_flutter.dart";
@@ -21,7 +21,7 @@ class _MainAboutState extends State<MainAbout> {
           children: [
             buildMainTitle("关于", context),
             buildDivider(),
-            _buildXLText("fotrix", context),
+            _buildXLText("fotrix"),
             buildText("Fotrix 是一个基于 Flutter 开发的aria2下载工具", context),
           ],
         ),
@@ -40,11 +40,11 @@ class _MainAboutState extends State<MainAbout> {
     );
   }
 
-  Widget _buildXLText(String text, BuildContext ctx) {
+  Widget _buildXLText(String text) {
     return Text(
       text,
       style: TextStyle(
-        color: ctx.textColor,
+        color: context.textColor,
         fontSize: 30,
         fontWeight: FontWeight.bold,
       ),

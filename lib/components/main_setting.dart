@@ -1,6 +1,6 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:fotrix/utils/common.dart';
+import 'package:fotrix/components/common.dart';
 import 'package:fotrix/store/config.dart';
 import 'package:fotrix/utils/theme.dart';
 
