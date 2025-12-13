@@ -8,9 +8,9 @@ import 'package:fotrix/store/task_list.dart';
 import 'package:fotrix/utils/aria2_client.dart';
 import 'package:fotrix/utils/logger.dart';
 import 'package:fotrix/utils/tray_service.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import "package:hive_ce_flutter/adapters.dart";
 
 class AppAction {
   static Future<void> init() async {

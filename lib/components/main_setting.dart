@@ -59,17 +59,17 @@ class _MainSettingState extends State<MainSetting> {
   Widget _buildSettingList(List<Widget> children, Widget child) {
     return Expanded(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [Column(children: children), child],
+        mainAxisAlignment: .spaceBetween,
+        children: [
+          Column(children: children),
+          child,
+        ],
       ),
     );
   }
 
   Widget _buildSec(String text) {
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: buildText(text, context),
-    );
+    return Padding(padding: const .all(12), child: buildText(text, context));
   }
 
   Widget _buildPowerBootSwitch() {
@@ -97,7 +97,7 @@ class _MainSettingState extends State<MainSetting> {
           child: TextField(
             controller: _mDCtrler,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(border: InputBorder.none),
+            decoration: InputDecoration(border: .none),
             style: TextStyle(color: context.textColor),
           ),
         ),
@@ -112,8 +112,8 @@ class _MainSettingState extends State<MainSetting> {
         Expanded(
           child: TextField(
             controller: _thCtrler,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(border: InputBorder.none),
+            keyboardType: .number,
+            decoration: InputDecoration(border: .none),
             style: TextStyle(color: context.textColor),
           ),
         ),
@@ -145,7 +145,7 @@ class _MainSettingState extends State<MainSetting> {
       style: ElevatedButton.styleFrom(
         backgroundColor: ctx.buttonColor,
         elevation: 0,
-        side: BorderSide.none,
+        side: .none,
       ),
       onPressed: onPressed,
       child: child,
@@ -154,9 +154,9 @@ class _MainSettingState extends State<MainSetting> {
 
   Widget _buildSaveCanelButton() {
     return Padding(
-      padding: const EdgeInsets.all(15.0),
+      padding: const .all(15.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: .center,
         children: [_buildSaveButton(), _buildCancelButton()],
       ),
     );
@@ -164,7 +164,7 @@ class _MainSettingState extends State<MainSetting> {
 
   Widget _buildSaveButton() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const .all(8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
         onPressed: () {
@@ -178,7 +178,7 @@ class _MainSettingState extends State<MainSetting> {
 
   Widget _buildCancelButton() {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const .all(8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(backgroundColor: context.buttonColor),
         onPressed: () {

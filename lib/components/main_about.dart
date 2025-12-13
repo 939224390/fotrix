@@ -15,7 +15,7 @@ class _MainAboutState extends State<MainAbout> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: .spaceBetween,
       children: [
         Column(
           children: [
@@ -27,7 +27,7 @@ class _MainAboutState extends State<MainAbout> {
         ),
         Watch(
           (_) => Padding(
-            padding: const EdgeInsets.only(bottom: 15),
+            padding: const .only(bottom: 15),
             child: Column(
               children: [
                 buildText("aria2: ${config.aria2Version}", context),
@@ -46,7 +46,7 @@ class _MainAboutState extends State<MainAbout> {
       style: TextStyle(
         color: context.textColor,
         fontSize: 30,
-        fontWeight: FontWeight.bold,
+        fontWeight: .bold,
       ),
     );
   }

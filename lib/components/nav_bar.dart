@@ -50,7 +50,7 @@ class _NavBarState extends State<NavBar> with TrayListener {
 
   Widget _buildNavgation(List<Widget> children) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: .spaceBetween,
       children: children,
     );
   }
@@ -81,7 +81,7 @@ class _NavBarState extends State<NavBar> with TrayListener {
 
   Widget _buildButton(IconData icon, VoidCallback func) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const .only(bottom: 12),
       child: IconButton(
         icon: Icon(icon, size: 30, color: Colors.white),
         onPressed: func,

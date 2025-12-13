@@ -35,7 +35,7 @@ class _TaskItemState extends State<TaskItem> {
     Widget trailing,
   ) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+      padding: const .symmetric(horizontal: 12, vertical: 2),
       child: Card(
         color: context.cardColor,
         child: ListTile(

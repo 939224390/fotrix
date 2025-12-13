@@ -6,7 +6,7 @@ Widget buildText(String text, BuildContext ctx) {
   return Text(
     text,
     maxLines: 1,
-    overflow: TextOverflow.ellipsis,
+    overflow: .ellipsis,
     style: TextStyle(color: ctx.textColor),
   );
 }
@@ -16,21 +16,12 @@ Widget buildLText(String text, BuildContext ctx) {
   return Text(text, style: TextStyle(color: ctx.textColor, fontSize: 20));
 }
 
-
 //默认分隔线
 Widget buildDivider() {
-  return Padding(
-    padding: const EdgeInsets.symmetric(horizontal: 12),
-    child: Divider(),
-  );
+  return Padding(padding: const .symmetric(horizontal: 12), child: Divider());
 }
 
 ///内容标题
 Widget buildMainTitle(String text, BuildContext ctx) {
-  return Padding(
-    padding: const EdgeInsets.all(12.0),
-    child: buildText(text, ctx),
-  );
+  return Padding(padding: const .all(12.0), child: buildText(text, ctx));
 }
-
-

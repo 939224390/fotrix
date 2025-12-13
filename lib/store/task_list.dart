@@ -182,6 +182,7 @@ class TaskList {
     }
   }
 
+  //设置任务状态
   void setTaskStatus(Task task, TaskStatus taskStatus) async {
     switch (taskStatus) {
       case TaskStatus.waiting:

@@ -57,7 +57,7 @@ class _TabsBarState extends State<TabsBar> {
 
   Widget _tabBarTitle(String text) {
     return Padding(
-      padding: const EdgeInsets.only(top: 20),
+      padding: const .only(top: 20),
       child: buildLText(text, context),
     );
   }
@@ -76,16 +76,14 @@ class _TabsBarState extends State<TabsBar> {
   Widget _buildTab(TabItem item, Function func, int index) {
     return Watch(
       (_) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+        padding: const .only(bottom: 10),
         child: ElevatedButton(
           onPressed: func as void Function()?,
           style: ElevatedButton.styleFrom(
             backgroundColor: _getButtonColor(index),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: .circular(10)),
             elevation: 0,
-            side: BorderSide.none,
+            side: .none,
           ),
           child: Row(
             children: [

@@ -43,7 +43,7 @@ class _AddTaskState extends State<AddTask> {
       title: buildText("新建下载任务", context),
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const .all(16.0),
           child: Column(children: children),
         ),
       ],

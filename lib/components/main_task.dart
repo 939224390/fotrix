@@ -37,11 +37,8 @@ class MainTask extends StatelessWidget {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: children,
-          ),
+          padding: const .all(12.0),
+          child: Row(mainAxisAlignment: .spaceBetween, children: children),
         ),
         buildDivider(),
         Expanded(child: child),
