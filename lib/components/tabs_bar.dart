@@ -16,6 +16,8 @@ class TabsBar extends StatefulWidget {
 }
 
 class _TabsBarState extends State<TabsBar> {
+  static const _animationDuration = Duration(milliseconds: 120);
+
   late final listLen = computed(
     () => [
       taskList.totalList.length,
@@ -76,24 +78,32 @@ class _TabsBarState extends State<TabsBar> {
   Widget _buildTab(TabItem item, Function func, int index) {
     return SignalBuilder(
       builder: (_) => Padding(
-        padding: const .only(bottom: 10),
-        child: ElevatedButton(
-          onPressed: func as void Function()?,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _getButtonColor(index),
-            shape: RoundedRectangleBorder(borderRadius: .circular(10)),
-            elevation: 0,
-            side: .none,
+        padding: const .only(left: 10, right: 10, bottom: 8),
+        child: AnimatedContainer(
+          duration: _animationDuration,
+          curve: Curves.easeOutQuart,
+          decoration: BoxDecoration(
+            color: _getButtonColor(index),
+            borderRadius: .circular(10),
           ),
-          child: Row(
-            children: [
-              Icon(item.icon, color: context.textColor),
-              buildText(item.title, context),
-              SizedBox(width: 5),
-              widget.data.tabIndex == 0
-                  ? buildText(listLen.value[index].toString(), context)
-                  : SizedBox.shrink(),
-            ],
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: func as void Function()?,
+              borderRadius: .circular(10),
+              child: Padding(
+                padding: const .symmetric(horizontal: 14, vertical: 9),
+                child: Row(
+                  children: [
+                    Icon(item.icon, size: 18, color: context.textColor),
+                    SizedBox(width: 6),
+                    Expanded(child: buildText(item.title, context)),
+                    if (widget.data.tabIndex == 0)
+                      buildText(listLen.value[index].toString(), context),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

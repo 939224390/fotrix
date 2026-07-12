@@ -59,6 +59,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         theme: ThemeManager.lightTheme,
         darkTheme: ThemeManager.darkTheme,
         themeMode: config.darkMode ? ThemeMode.dark : ThemeMode.light,
+        themeAnimationDuration: const Duration(milliseconds: 160),
+        themeAnimationCurve: Curves.easeOutQuart,
         debugShowCheckedModeBanner: false,
         routerConfig: router,
       ),
