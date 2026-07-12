@@ -25,8 +25,8 @@ class _MainAboutState extends State<MainAbout> {
             buildText("Fotrix 是一个基于 Flutter 开发的aria2下载工具", context),
           ],
         ),
-        Watch(
-          (_) => Padding(
+        SignalBuilder(
+          builder: (_) => Padding(
             padding: const .only(bottom: 15),
             child: Column(
               children: [

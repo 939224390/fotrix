@@ -18,8 +18,8 @@ class _TaskItemState extends State<TaskItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch(
-      (_) => _taskCard(
+    return SignalBuilder(
+      builder: (_) => _taskCard(
         _stateBtn(widget.task),
         _taskTitleandProgress(),
         _dltlSize(widget.task),

@@ -27,8 +27,8 @@ class _TabsBarState extends State<TabsBar> {
 
   @override
   Widget build(BuildContext context) {
-    return Watch(
-      (_) => _buildTabBar(
+    return SignalBuilder(
+      builder: (_) => _buildTabBar(
         itemBuilder: (sideItem) {
           return [
             //侧边标题
@@ -74,8 +74,8 @@ class _TabsBarState extends State<TabsBar> {
   }
 
   Widget _buildTab(TabItem item, Function func, int index) {
-    return Watch(
-      (_) => Padding(
+    return SignalBuilder(
+      builder: (_) => Padding(
         padding: const .only(bottom: 10),
         child: ElevatedButton(
           onPressed: func as void Function()?,

@@ -54,14 +54,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Watch((context) {
-      return MaterialApp.router(
+    return SignalBuilder(
+      builder: (context) => MaterialApp.router(
         theme: ThemeManager.lightTheme,
         darkTheme: ThemeManager.darkTheme,
         themeMode: config.darkMode ? ThemeMode.dark : ThemeMode.light,
         debugShowCheckedModeBanner: false,
         routerConfig: router,
-      );
-    });
+      ),
+    );
   }
 }

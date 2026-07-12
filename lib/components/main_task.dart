@@ -28,7 +28,7 @@ class MainTask extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _buildMain([
-      buildMainTitle(title.watch(context), context),
+      SignalBuilder(builder: (context) => buildMainTitle(title.value, context)),
       _buildBtn(context),
     ], _buildList());
   }
@@ -64,8 +64,8 @@ class MainTask extends StatelessWidget {
   }
 
   Widget _buildList() {
-    return Watch(
-      (_) => ListView.builder(
+    return SignalBuilder(
+      builder: (_) => ListView.builder(
         shrinkWrap: true,
         itemCount: currList.value.length,
         itemBuilder: (context, index) {

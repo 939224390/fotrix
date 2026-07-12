@@ -193,7 +193,7 @@ class _MainSettingState extends State<MainSetting> {
 
   Future<void> _selectDirectory() async {
     try {
-      String? stDir = await FilePicker.platform.getDirectoryPath();
+      String? stDir = await FilePicker.getDirectoryPath();
       if (!mounted) return;
       if (stDir != null && stDir.isNotEmpty) {
         setState(() {
